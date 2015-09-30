@@ -1,0 +1,33 @@
+{
+    "name": "cvuorinen/raspicam-php",
+    "description": "Control Raspberry Pi camera module with PHP",
+    "keywords": ["camera", "raspberry", "raspberry pi", "raspistill", "raspistillyuv", "raspivid", "photo", "video", "timelapse", "hardware"],
+    "type": "library",
+    "license": "MIT",
+    "homepage" : "https://github.com/cvuorinen/raspicam-php",
+    "authors": [
+        {
+            "name": "Carl Vuorinen",
+            "email": "carl.vuorinen@gmail.com"
+        }
+    ],
+    "require": {
+        "php" : ">=5.5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cvuorinen\\Raspicam\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cvuorinen\\Raspicam\\Test\\": "test"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
