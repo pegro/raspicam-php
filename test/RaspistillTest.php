@@ -30,10 +30,10 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->commandBuilder = $this->getMockBuilder(Builder::class)
+        $this->commandBuilder = $this->getMockBuilder('AdamBrett\ShellWrapper\Command\Builder')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->commandRunner = $this->getMock(Exec::class);
+        $this->commandRunner = $this->getMock('AdamBrett\ShellWrapper\Runners\Exec');
 
         $this->raspistill = new Raspistill();
 
@@ -52,7 +52,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->method('getReturnValue')
             ->willReturn(ExitCodes::SUCCESS);
 
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->setExpectedException('InvalidArgumentException');
 
         $this->raspistill->takePicture('');
     }
@@ -93,7 +93,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->willReturn(ExitCodes::GENERAL_ERROR);
 
         $this->setExpectedException(
-            CommandFailedException::class
+            'Cvuorinen\Raspicam\CommandFailedException'
         );
 
         $this->raspistill->takePicture('foo.jpg');
@@ -106,7 +106,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->willReturn(ExitCodes::COMMAND_NOT_FOUND);
 
         $this->setExpectedException(
-            CommandFailedException::class,
+            'Cvuorinen\Raspicam\CommandFailedException',
             'Command not found'
         );
 
