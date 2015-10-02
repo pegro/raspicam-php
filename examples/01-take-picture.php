@@ -6,7 +6,7 @@ use Cvuorinen\Raspicam\Raspistill;
 
 $camera = new Raspistill();
 
-$filename = date('Y-m-d_H:i:s') . '.jpg';
+$filename = date('Y-m-d_H.i.s') . '.jpg';
 
 try {
     $camera->takePicture($filename);
