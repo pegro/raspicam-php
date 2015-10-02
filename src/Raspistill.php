@@ -40,6 +40,13 @@ class Raspistill extends Raspicam
     protected $contrast;
 
     /**
+     * @var int
+     */
+    protected $brightness;
+
+    /**
+     * Flips the image vertically
+     *
      * @param bool $value
      *
      * @return $this
@@ -52,6 +59,8 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Flips the image horizontally
+     *
      * @param bool $value
      *
      * @return $this
@@ -64,6 +73,8 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set the sharpness of the image, 0 is the default (-100 to 100)
+     *
      * @param int $value
      *
      * @return $this
@@ -78,6 +89,8 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set the contrast of the image, 0 is the default (-100 to 100)
+     *
      * @param int $value
      *
      * @return $this
@@ -87,6 +100,22 @@ class Raspistill extends Raspicam
         $this->assertIntBetween($value, -100, 100);
 
         $this->contrast = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the brightness of the image, 50 is the default. 0 is black, 100 is white.
+     *
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function brightness($value)
+    {
+        $this->assertIntBetween($value, 0, 100);
+
+        $this->brightness = $value;
 
         return $this;
     }
@@ -140,6 +169,10 @@ class Raspistill extends Raspicam
 
         if (null !== $this->contrast) {
             $command->addArgument('contrast', $this->contrast);
+        }
+
+        if (null !== $this->brightness) {
+            $command->addArgument('brightness', $this->brightness);
         }
 
         return $command;

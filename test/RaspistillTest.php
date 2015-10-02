@@ -156,6 +156,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validIntegerBetweenZeroAndHundredProvider
+     */
+    public function testBrightnessSetsCorrectArgument($brightness)
+    {
+        $this->expectCommandContains("--brightness '" . $brightness . "'");
+
+        $this->raspistill->brightness($brightness);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidIntegerBetweenZeroAndHundredProvider
+     */
+    public function testInvalidBrightnessThrowsException($brightness)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->brightness($brightness);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -180,6 +201,37 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [999],
             [101],
             [-999],
+            [-101],
+            [5.5],
+            [-12.0],
+            [false],
+            [null],
+            ['foo']
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validIntegerBetweenZeroAndHundredProvider()
+    {
+        return [
+            [1],
+            [99],
+            [100],
+            [0],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidIntegerBetweenZeroAndHundredProvider()
+    {
+        return [
+            [999],
+            [101],
+            [-1],
             [-101],
             [5.5],
             [-12.0],
