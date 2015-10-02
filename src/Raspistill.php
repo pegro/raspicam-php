@@ -25,22 +25,19 @@ class Raspistill extends Raspicam
     protected $valueArguments = [];
 
     /**
-     * @var array
+     * Flips the image both vertically and horizontally
+     *
+     * @param bool $value
+     *
+     * @return $this
      */
-    private $exposureModes = [
-        self::EXPOSURE_AUTO,
-        self::EXPOSURE_NIGHT,
-        self::EXPOSURE_NIGHTPREVIEW,
-        self::EXPOSURE_BACKLIGHT,
-        self::EXPOSURE_SPOTLIGHT,
-        self::EXPOSURE_SPORTS,
-        self::EXPOSURE_SNOW,
-        self::EXPOSURE_BEACH,
-        self::EXPOSURE_VERYLONG,
-        self::EXPOSURE_FIXEDFPS,
-        self::EXPOSURE_ANTISHAKE,
-        self::EXPOSURE_FIREWORKS,
-    ];
+    public function flip($value = true)
+    {
+        $this->booleanArguments['vflip'] = (bool) $value;
+        $this->booleanArguments['hflip'] = (bool) $value;
+
+        return $this;
+    }
 
     /**
      * Flips the image vertically
@@ -188,7 +185,22 @@ class Raspistill extends Raspicam
      */
     public function exposure($mode)
     {
-        $this->assertInArray($mode, $this->exposureModes);
+        $exposureModes = [
+            self::EXPOSURE_AUTO,
+            self::EXPOSURE_NIGHT,
+            self::EXPOSURE_NIGHTPREVIEW,
+            self::EXPOSURE_BACKLIGHT,
+            self::EXPOSURE_SPOTLIGHT,
+            self::EXPOSURE_SPORTS,
+            self::EXPOSURE_SNOW,
+            self::EXPOSURE_BEACH,
+            self::EXPOSURE_VERYLONG,
+            self::EXPOSURE_FIXEDFPS,
+            self::EXPOSURE_ANTISHAKE,
+            self::EXPOSURE_FIREWORKS,
+        ];
+
+        $this->assertInArray($mode, $exposureModes);
 
         $this->valueArguments['exposure'] = $mode;
 

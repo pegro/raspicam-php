@@ -128,6 +128,14 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->takePicture('foo.jpg');
     }
 
+    public function testFlipSetsBothVerticalAndHorizontalArguments()
+    {
+        $this->expectCommandContains(['--vflip', '--hflip']);
+
+        $this->raspistill->flip();
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
     /**
      * @dataProvider validIntegerBetweenNegativeHundredAndHundredProvider
      */
@@ -448,15 +456,21 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $string
+     * @param string|array $strings
      */
-    private function expectCommandContains($string)
+    private function expectCommandContains($strings)
     {
+        if (!is_array($strings)) {
+            $strings = [$strings];
+        }
+
         $this->commandRunner
             ->expects($this->once())
             ->method('run')
-            ->with($this->callback(function (CommandInterface $command) use ($string) {
-                $this->assertContains($string, $command->__toString());
+            ->with($this->callback(function (CommandInterface $command) use ($strings) {
+                foreach ($strings as $string) {
+                    $this->assertContains($string, $command->__toString());
+                }
 
                 return true;
             }));
