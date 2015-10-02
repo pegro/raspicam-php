@@ -114,6 +114,58 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validSharpnessProvider
+     */
+    public function testSharpnessSetsCorrectArgument($sharpness)
+    {
+        $this->expectCommandContains("--sharpness '" . $sharpness . "'");
+
+        $this->raspistill->sharpness($sharpness);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @return array
+     */
+    public function validSharpnessProvider()
+    {
+        return [
+            [1],
+            [99],
+            [100],
+            [0],
+            [-1],
+            [-99],
+            [-100]
+        ];
+    }
+
+    /**
+     * @dataProvider invalidSharpnessProvider
+     */
+    public function testInvalidSharpnessThrowsException($sharpness)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->sharpness($sharpness);
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidSharpnessProvider()
+    {
+        return [
+            [999],
+            [101],
+            [-999],
+            [-101],
+            [null],
+            ['foo']
+        ];
+    }
+
+    /**
      * @param string $string
      */
     private function expectCommandContains($string)

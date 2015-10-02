@@ -30,13 +30,18 @@ class Raspistill extends Raspicam
     protected $horizontalFlip;
 
     /**
+     * @var int
+     */
+    protected $sharpness;
+
+    /**
      * @param bool $value
      *
      * @return $this
      */
     public function verticalFlip($value = true)
     {
-        $this->verticalFlip = $value;
+        $this->verticalFlip = (bool) $value;
 
         return $this;
     }
@@ -48,7 +53,21 @@ class Raspistill extends Raspicam
      */
     public function horizontalFlip($value = true)
     {
-        $this->horizontalFlip = $value;
+        $this->horizontalFlip = (bool) $value;
+
+        return $this;
+    }
+
+    /**
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function sharpness($value)
+    {
+        $this->assertIntBetween($value, -100, 100);
+
+        $this->sharpness = $value;
 
         return $this;
     }
@@ -96,6 +115,24 @@ class Raspistill extends Raspicam
             $command->addArgument('hflip');
         }
 
+        if (null !== $this->sharpness) {
+            $command->addArgument('sharpness', $this->sharpness);
+        }
+
         return $command;
+    }
+
+    /**
+     * @param int $value
+     * @param int $min
+     * @param int $max
+     */
+    private function assertIntBetween($value, $min, $max)
+    {
+        if (!is_int($value) || $value < $min || $value > $max) {
+            throw new \InvalidArgumentException(
+                sprintf('Expected integer between %s and %s', $min, $max)
+            );
+        }
     }
 }
