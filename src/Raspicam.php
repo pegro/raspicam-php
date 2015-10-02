@@ -16,6 +16,19 @@ use AdamBrett\ShellWrapper\Runners\Runner;
  */
 abstract class Raspicam
 {
+    const EXPOSURE_AUTO = 'auto';
+    const EXPOSURE_NIGHT = 'night';
+    const EXPOSURE_NIGHTPREVIEW = 'nightpreview';
+    const EXPOSURE_BACKLIGHT = 'backlight';
+    const EXPOSURE_SPOTLIGHT = 'spotlight';
+    const EXPOSURE_SPORTS = 'sports';
+    const EXPOSURE_SNOW = 'snow';
+    const EXPOSURE_BEACH = 'beach';
+    const EXPOSURE_VERYLONG = 'verylong';
+    const EXPOSURE_FIXEDFPS = 'fixedfps';
+    const EXPOSURE_ANTISHAKE = 'antishake';
+    const EXPOSURE_FIREWORKS = 'fireworks';
+
     /**
      * @var Runner
      */

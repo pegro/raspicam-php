@@ -255,6 +255,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validExposureProvider
+     */
+    public function testExposureSetsCorrectArgument($exposure)
+    {
+        $this->expectCommandContains("--exposure '" . $exposure . "'");
+
+        $this->raspistill->exposure($exposure);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidStringProvider
+     */
+    public function testInvalidExposureThrowsException($exposure)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->exposure($exposure);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -384,6 +405,45 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [false],
             [null],
             ['foo']
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validExposureProvider()
+    {
+        return [
+            [Raspistill::EXPOSURE_AUTO],
+            [Raspistill::EXPOSURE_NIGHT],
+            [Raspistill::EXPOSURE_NIGHTPREVIEW],
+            [Raspistill::EXPOSURE_BACKLIGHT],
+            [Raspistill::EXPOSURE_SPOTLIGHT],
+            [Raspistill::EXPOSURE_SPORTS],
+            [Raspistill::EXPOSURE_SNOW],
+            [Raspistill::EXPOSURE_BEACH],
+            [Raspistill::EXPOSURE_VERYLONG],
+            [Raspistill::EXPOSURE_FIXEDFPS],
+            [Raspistill::EXPOSURE_ANTISHAKE],
+            [Raspistill::EXPOSURE_FIREWORKS],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidStringProvider()
+    {
+        return [
+            ['foo'],
+            ['%¤"*-@'],
+            [1],
+            [0],
+            [-11],
+            [5.5],
+            [-2.0],
+            [false],
+            [null],
         ];
     }
 

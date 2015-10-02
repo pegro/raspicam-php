@@ -25,6 +25,24 @@ class Raspistill extends Raspicam
     protected $valueArguments = [];
 
     /**
+     * @var array
+     */
+    private $exposureModes = [
+        self::EXPOSURE_AUTO,
+        self::EXPOSURE_NIGHT,
+        self::EXPOSURE_NIGHTPREVIEW,
+        self::EXPOSURE_BACKLIGHT,
+        self::EXPOSURE_SPOTLIGHT,
+        self::EXPOSURE_SPORTS,
+        self::EXPOSURE_SNOW,
+        self::EXPOSURE_BEACH,
+        self::EXPOSURE_VERYLONG,
+        self::EXPOSURE_FIXEDFPS,
+        self::EXPOSURE_ANTISHAKE,
+        self::EXPOSURE_FIREWORKS,
+    ];
+
+    /**
      * Flips the image vertically
      *
      * @param bool $value
@@ -149,6 +167,35 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set exposure mode
+     * Possible options are:
+     *  - 'auto' Use automatic exposure mode
+     *  - 'night' Select setting for night shooting
+     *  - 'nightpreview'
+     *  - 'backlight' Select setting for back lit subject
+     *  - 'spotlight'
+     *  - 'sports' Select setting for sports (fast shutter etc)
+     *  - 'snow' Select setting optimised for snowy scenery
+     *  - 'beach' Select setting optimised for beach
+     *  - 'verylong' Select setting for long exposures
+     *  - 'fixedfps' Constrain fps to a fixed value
+     *  - 'antishake' Antishake mode
+     *  - 'fireworks' Select settings
+     *
+     * @param string $mode
+     *
+     * @return $this
+     */
+    public function exposure($mode)
+    {
+        $this->assertInArray($mode, $this->exposureModes);
+
+        $this->valueArguments['exposure'] = $mode;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getExecutable()
@@ -202,6 +249,19 @@ class Raspistill extends Raspicam
         if (!is_int($value) || $value < $min || $value > $max) {
             throw new \InvalidArgumentException(
                 sprintf('Expected integer between %s and %s', $min, $max)
+            );
+        }
+    }
+
+    /**
+     * @param mixed $value
+     * @param array $validValues
+     */
+    private function assertInArray($value, array $validValues)
+    {
+        if (!in_array($value, $validValues, true)) {
+            throw new \InvalidArgumentException(
+                sprintf('Expected value to be one of [%s]', implode(', ', $validValues))
             );
         }
     }
