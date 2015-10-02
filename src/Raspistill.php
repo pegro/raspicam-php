@@ -15,34 +15,14 @@ class Raspistill extends Raspicam
     const COMMAND = 'raspistill';
 
     /**
-     * @var string
+     * @var array
      */
-    protected $filename;
+    protected $booleanArguments = [];
 
     /**
-     * @var bool
+     * @var array
      */
-    protected $verticalFlip;
-
-    /**
-     * @var bool
-     */
-    protected $horizontalFlip;
-
-    /**
-     * @var int
-     */
-    protected $sharpness;
-
-    /**
-     * @var int
-     */
-    protected $contrast;
-
-    /**
-     * @var int
-     */
-    protected $brightness;
+    protected $valueArguments = [];
 
     /**
      * Flips the image vertically
@@ -53,7 +33,7 @@ class Raspistill extends Raspicam
      */
     public function verticalFlip($value = true)
     {
-        $this->verticalFlip = (bool) $value;
+        $this->booleanArguments['vflip'] = (bool) $value;
 
         return $this;
     }
@@ -67,7 +47,7 @@ class Raspistill extends Raspicam
      */
     public function horizontalFlip($value = true)
     {
-        $this->horizontalFlip = (bool) $value;
+        $this->booleanArguments['hflip'] = (bool) $value;
 
         return $this;
     }
@@ -83,7 +63,7 @@ class Raspistill extends Raspicam
     {
         $this->assertIntBetween($value, -100, 100);
 
-        $this->sharpness = $value;
+        $this->valueArguments['sharpness'] = $value;
 
         return $this;
     }
@@ -99,7 +79,7 @@ class Raspistill extends Raspicam
     {
         $this->assertIntBetween($value, -100, 100);
 
-        $this->contrast = $value;
+        $this->valueArguments['contrast'] = $value;
 
         return $this;
     }
@@ -115,7 +95,23 @@ class Raspistill extends Raspicam
     {
         $this->assertIntBetween($value, 0, 100);
 
-        $this->brightness = $value;
+        $this->valueArguments['brightness'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * set the colour saturation of the image. 0 is the default (-100 to 100)
+     *
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function saturation($value)
+    {
+        $this->assertIntBetween($value, -100, 100);
+
+        $this->valueArguments['saturation'] = $value;
 
         return $this;
     }
@@ -137,7 +133,7 @@ class Raspistill extends Raspicam
             throw new \InvalidArgumentException('Filename required');
         }
 
-        $this->filename = $filename;
+        $this->valueArguments['output'] = $filename;
 
         $this->execute(
             $this->buildCommand()
@@ -151,28 +147,14 @@ class Raspistill extends Raspicam
     {
         $command = $this->getCommandBuilder();
 
-        if ($this->filename) {
-            $command->addArgument('output', $this->filename);
+        foreach ($this->booleanArguments as $name => $value) {
+            if ($value) {
+                $command->addArgument($name);
+            }
         }
 
-        if ($this->verticalFlip) {
-            $command->addArgument('vflip');
-        }
-
-        if ($this->horizontalFlip) {
-            $command->addArgument('hflip');
-        }
-
-        if (null !== $this->sharpness) {
-            $command->addArgument('sharpness', $this->sharpness);
-        }
-
-        if (null !== $this->contrast) {
-            $command->addArgument('contrast', $this->contrast);
-        }
-
-        if (null !== $this->brightness) {
-            $command->addArgument('brightness', $this->brightness);
+        foreach ($this->valueArguments as $name => $value) {
+            $command->addArgument($name, $value);
         }
 
         return $command;

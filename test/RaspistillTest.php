@@ -177,6 +177,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validIntegerBetweenNegativeHundredAndHundredProvider
+     */
+    public function testSaturationSetsCorrectArgument($saturation)
+    {
+        $this->expectCommandContains("--saturation '" . $saturation . "'");
+
+        $this->raspistill->saturation($saturation);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidIntegerBetweenNegativeHundredAndHundredProvider
+     */
+    public function testInvalidSaturationThrowsException($saturation)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->saturation($saturation);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -250,7 +271,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('run')
             ->with($this->callback(function (CommandInterface $command) use ($string) {
-                $this->assertContains($string, (string) $command);
+                $this->assertContains($string, $command->__toString());
 
                 return true;
             }));
@@ -265,7 +286,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('run')
             ->with($this->callback(function (CommandInterface $command) use ($string) {
-                $this->assertNotContains($string, (string) $command);
+                $this->assertNotContains($string, $command->__toString());
 
                 return true;
             }));
