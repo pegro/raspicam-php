@@ -101,7 +101,7 @@ class Raspistill extends Raspicam
     }
 
     /**
-     * set the colour saturation of the image. 0 is the default (-100 to 100)
+     * Set the colour saturation of the image. 0 is the default (-100 to 100)
      *
      * @param int $value
      *
@@ -112,6 +112,22 @@ class Raspistill extends Raspicam
         $this->assertIntBetween($value, -100, 100);
 
         $this->valueArguments['saturation'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Sets the ISO to be used for captures. Range is 100 to 800.
+     *
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function ISO($value)
+    {
+        $this->assertIntBetween($value, 100, 800);
+
+        $this->valueArguments['ISO'] = $value;
 
         return $this;
     }

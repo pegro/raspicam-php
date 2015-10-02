@@ -213,6 +213,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validIntegerBetweenHundredAndEightHundredProvider
+     */
+    public function testISOSetsCorrectArgument($iso)
+    {
+        $this->expectCommandContains("--ISO '" . $iso . "'");
+
+        $this->raspistill->ISO($iso);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidIntegerBetweenHundredAndEightHundredProvider
+     */
+    public function testInvalidISOThrowsException($iso)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->ISO($iso);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -267,6 +288,40 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         return [
             [999],
             [101],
+            [-1],
+            [-101],
+            [5.5],
+            [-12.0],
+            [false],
+            [null],
+            ['foo']
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validIntegerBetweenHundredAndEightHundredProvider()
+    {
+        return [
+            [100],
+            [101],
+            [567],
+            [800]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidIntegerBetweenHundredAndEightHundredProvider()
+    {
+        return [
+            [801],
+            [999],
+            [99],
+            [1],
+            [0],
             [-1],
             [-101],
             [5.5],
