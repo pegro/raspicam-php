@@ -50,6 +50,21 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->takePicture('foo.jpg');
     }
 
+    public function testGetOutputReturnCommandOutput()
+    {
+        $this->commandRunner
+            ->expects($this->once())
+            ->method('getOutput')
+            ->willReturn('some-output');
+
+        $this->raspistill->takePicture('foo.jpg');
+
+        $this->assertEquals(
+            'some-output',
+            $this->raspistill->getOutput()
+        );
+    }
+
     public function testTakePictureSetsOutputArgument()
     {
         $filename = 'foo.jpg';
