@@ -160,6 +160,9 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [101],
             [-999],
             [-101],
+            [5.5],
+            [-12.0],
+            [false],
             [null],
             ['foo']
         ];
