@@ -114,7 +114,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider validSharpnessProvider
+     * @dataProvider validIntegerBetweenNegativeHundredAndHundredProvider
      */
     public function testSharpnessSetsCorrectArgument($sharpness)
     {
@@ -125,9 +125,40 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider invalidIntegerBetweenNegativeHundredAndHundredProvider
+     */
+    public function testInvalidSharpnessThrowsException($sharpness)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->sharpness($sharpness);
+    }
+
+    /**
+     * @dataProvider validIntegerBetweenNegativeHundredAndHundredProvider
+     */
+    public function testContrastSetsCorrectArgument($contrast)
+    {
+        $this->expectCommandContains("--contrast '" . $contrast . "'");
+
+        $this->raspistill->contrast($contrast);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidIntegerBetweenNegativeHundredAndHundredProvider
+     */
+    public function testInvalidContrastThrowsException($contrast)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->contrast($contrast);
+    }
+
+    /**
      * @return array
      */
-    public function validSharpnessProvider()
+    public function validIntegerBetweenNegativeHundredAndHundredProvider()
     {
         return [
             [1],
@@ -141,19 +172,9 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider invalidSharpnessProvider
-     */
-    public function testInvalidSharpnessThrowsException($sharpness)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->sharpness($sharpness);
-    }
-
-    /**
      * @return array
      */
-    public function invalidSharpnessProvider()
+    public function invalidIntegerBetweenNegativeHundredAndHundredProvider()
     {
         return [
             [999],

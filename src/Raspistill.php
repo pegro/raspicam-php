@@ -35,6 +35,11 @@ class Raspistill extends Raspicam
     protected $sharpness;
 
     /**
+     * @var int
+     */
+    protected $contrast;
+
+    /**
      * @param bool $value
      *
      * @return $this
@@ -68,6 +73,20 @@ class Raspistill extends Raspicam
         $this->assertIntBetween($value, -100, 100);
 
         $this->sharpness = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function contrast($value)
+    {
+        $this->assertIntBetween($value, -100, 100);
+
+        $this->contrast = $value;
 
         return $this;
     }
@@ -117,6 +136,10 @@ class Raspistill extends Raspicam
 
         if (null !== $this->sharpness) {
             $command->addArgument('sharpness', $this->sharpness);
+        }
+
+        if (null !== $this->contrast) {
+            $command->addArgument('contrast', $this->contrast);
         }
 
         return $command;
