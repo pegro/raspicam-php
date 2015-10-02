@@ -36,10 +36,6 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
 
     public function testTakePictureThrowsExceptionOnEmptyFilename()
     {
-        $this->commandRunner
-            ->method('getReturnValue')
-            ->willReturn(ExitCodes::SUCCESS);
-
         $this->setExpectedException('InvalidArgumentException');
 
         $this->raspistill->takePicture('');
@@ -51,13 +47,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('run');
 
-        $this->commandRunner
-            ->method('getReturnValue')
-            ->willReturn(ExitCodes::SUCCESS);
-
-        $picture = $this->raspistill->takePicture('foo.jpg');
-
-        $this->assertTrue($picture);
+        $this->raspistill->takePicture('foo.jpg');
     }
 
     public function testTakePictureSetsOutputArgument()
@@ -66,9 +56,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
 
         $this->expectCommandContains("--output '" . $filename . "'");
 
-        $picture = $this->raspistill->takePicture($filename);
-
-        $this->assertTrue($picture);
+        $this->raspistill->takePicture($filename);
     }
 
     public function testFailedCommandThrowsException()

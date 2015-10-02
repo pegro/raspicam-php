@@ -69,16 +69,13 @@ abstract class Raspicam
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     protected function execute(CommandInterface $command)
     {
         $runner = $this->getCommandRunner();
 
         $this->lastReturnValue = $runner->run($command);
 
-        return $this->getReturnValue($runner);
+        $this->checkReturnValue($runner);
     }
 
     /**
@@ -87,7 +84,7 @@ abstract class Raspicam
      * @return bool
      * @throws CommandFailedException
      */
-    private function getReturnValue(Runner $runner)
+    private function checkReturnValue(Runner $runner)
     {
         if (!($runner instanceof ReturnValue)) {
             return true;

@@ -63,8 +63,6 @@ class Raspistill extends Raspicam
 
     /**
      * @param string $filename
-     *
-     * @return bool
      */
     public function takePicture($filename)
     {
@@ -74,7 +72,7 @@ class Raspistill extends Raspicam
 
         $this->filename = $filename;
 
-        return $this->execute(
+        $this->execute(
             $this->buildCommand()
         );
     }
