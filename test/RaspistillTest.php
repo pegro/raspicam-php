@@ -2,7 +2,7 @@
 
 namespace Cvuorinen\Raspicam\Test;
 
-use AdamBrett\ShellWrapper\Command\Builder;
+use AdamBrett\ShellWrapper\Command\CommandInterface;
 use AdamBrett\ShellWrapper\ExitCodes;
 use AdamBrett\ShellWrapper\Runners\Exec;
 use Cvuorinen\Raspicam\CommandFailedException;
@@ -20,26 +20,14 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     /**
      * @var PHPUnit_Framework_MockObject_MockObject
      */
-    private $commandBuilder;
-
-    /**
-     * @var PHPUnit_Framework_MockObject_MockObject
-     */
     private $commandRunner;
 
 
     public function setUp()
     {
-        $this->commandBuilder = $this->getMockBuilder('AdamBrett\ShellWrapper\Command\Builder')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->commandRunner = $this->getMock('AdamBrett\ShellWrapper\Runners\Exec');
 
         $this->raspistill = new Raspistill();
-
-        $this->raspistill->setCommandBuilder(
-            $this->commandBuilder
-        );
 
         $this->raspistill->setCommandRunner(
             $this->commandRunner
@@ -76,10 +64,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $filename = 'foo.jpg';
 
-        $this->commandBuilder
-            ->expects($this->once())
-            ->method('addArgument')
-            ->with($this->equalTo('output'), $this->equalTo($filename));
+        $this->expectCommandContains("--output '" . $filename . "'");
 
         $picture = $this->raspistill->takePicture($filename);
 
@@ -111,5 +96,62 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         );
 
         $this->raspistill->takePicture('foo.jpg');
+    }
+
+    public function testVerticalFlipSetsCorrectArgument()
+    {
+        $this->expectCommandContains('--vflip');
+
+        $this->raspistill->verticalFlip();
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    public function testVerticalFlipArgumentNotSetWhenUnset()
+    {
+        $this->raspistill->verticalFlip();
+        $this->raspistill->takePicture('foo.jpg');
+
+        $this->expectCommandNotContains('--vflip');
+
+        $this->raspistill->verticalFlip(false);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    public function testHorizontalFlipSetsCorrectArgument()
+    {
+        $this->expectCommandContains('--hflip');
+
+        $this->raspistill->horizontalFlip();
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @param string $string
+     */
+    private function expectCommandContains($string)
+    {
+        $this->commandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->callback(function (CommandInterface $command) use ($string) {
+                $this->assertContains($string, (string) $command);
+
+                return true;
+            }));
+    }
+
+    /**
+     * @param string $string
+     */
+    private function expectCommandNotContains($string)
+    {
+        $this->commandRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->callback(function (CommandInterface $command) use ($string) {
+                $this->assertNotContains($string, (string) $command);
+
+                return true;
+            }));
     }
 }

@@ -17,11 +17,6 @@ use AdamBrett\ShellWrapper\Runners\Runner;
 abstract class Raspicam
 {
     /**
-     * @var CommandBuilder
-     */
-    protected $commandBuilder;
-
-    /**
      * @var Runner
      */
     protected $commandRunner;
@@ -43,27 +38,9 @@ abstract class Raspicam
      */
     protected function getCommandBuilder()
     {
-        if (null === $this->commandBuilder) {
-            $this->commandBuilder = new CommandBuilder(
-                $this->getExecutable()
-            );
-        }
-
-        return $this->commandBuilder;
-    }
-
-    /**
-     * Mainly used as dependency injection with unit tests
-     *
-     * @param CommandBuilder $builder
-     *
-     * @return $this
-     */
-    public function setCommandBuilder(CommandBuilder $builder)
-    {
-        $this->commandBuilder = $builder;
-
-        return $this;
+        return new CommandBuilder(
+            $this->getExecutable()
+        );
     }
 
     /**
