@@ -133,6 +133,22 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set the exposure (EV) compensation of the image. Range is -10 to +10, default is 0.
+     *
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function exposureCompensation($value)
+    {
+        $this->assertIntBetween($value, -10, 10);
+
+        $this->valueArguments['ev'] = $value;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getExecutable()

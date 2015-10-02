@@ -234,6 +234,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validIntegerBetweenNegativeTenAndTenProvider
+     */
+    public function testExposureCompensationSetsCorrectArgument($ev)
+    {
+        $this->expectCommandContains("--ev '" . $ev . "'");
+
+        $this->raspistill->exposureCompensation($ev);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidIntegerBetweenNegativeTenAndTenProvider
+     */
+    public function testInvalidExposureCompensationThrowsException($ev)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->exposureCompensation($ev);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -326,6 +347,40 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [-101],
             [5.5],
             [-12.0],
+            [false],
+            [null],
+            ['foo']
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validIntegerBetweenNegativeTenAndTenProvider()
+    {
+        return [
+            [1],
+            [9],
+            [10],
+            [0],
+            [-1],
+            [-9],
+            [-10]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidIntegerBetweenNegativeTenAndTenProvider()
+    {
+        return [
+            [99],
+            [11],
+            [-99],
+            [-11],
+            [5.5],
+            [-2.0],
             [false],
             [null],
             ['foo']
