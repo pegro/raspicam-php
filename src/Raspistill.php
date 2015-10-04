@@ -243,6 +243,26 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Time in seconds before takes picture, default is 5
+     *
+     * The camera will run for this length of time, then take the picture.
+     *
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function timeout($value)
+    {
+        if (!is_int($value) || $value < 0) {
+            throw new \InvalidArgumentException('Expected positive integer');
+        }
+
+        $this->valueArguments['timeout'] = $value * 1000; // convert to milliseconds
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getExecutable()

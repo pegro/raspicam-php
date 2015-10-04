@@ -312,6 +312,21 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->takePicture('foo.jpg');
     }
 
+    public function testTimeoutSetsCorrectArgument()
+    {
+        $this->expectCommandContains("--timeout '2000'");
+
+        $this->raspistill->timeout(2);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    public function testInvalidTimeoutThrowsException()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->timeout(-2);
+    }
+
     /**
      * @return array
      */
