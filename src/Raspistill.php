@@ -208,6 +208,23 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set jpeg quality (0 to 100)
+     * Quality 100 is almost completely uncompressed. 75 is a good all round value
+     *
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function quality($value)
+    {
+        $this->assertIntBetween($value, 0, 100);
+
+        $this->valueArguments['quality'] = $value;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getExecutable()

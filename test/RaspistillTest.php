@@ -284,6 +284,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validIntegerBetweenZeroAndHundredProvider
+     */
+    public function testQualitySetsCorrectArgument($quality)
+    {
+        $this->expectCommandContains("--quality '" . $quality . "'");
+
+        $this->raspistill->quality($quality);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidIntegerBetweenZeroAndHundredProvider
+     */
+    public function testInvalidQualityThrowsException($quality)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->quality($quality);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
