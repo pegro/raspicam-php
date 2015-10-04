@@ -328,6 +328,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validWhiteBalanceProvider
+     */
+    public function testWhiteBalanceSetsCorrectArgument($whiteBalance)
+    {
+        $this->expectCommandContains("--awb '" . $whiteBalance . "'");
+
+        $this->raspistill->whiteBalance($whiteBalance);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidStringProvider
+     */
+    public function testInvalidWhiteBalanceThrowsException($whiteBalance)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->whiteBalance($whiteBalance);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -478,6 +499,25 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [Raspistill::EXPOSURE_FIXEDFPS],
             [Raspistill::EXPOSURE_ANTISHAKE],
             [Raspistill::EXPOSURE_FIREWORKS],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validWhiteBalanceProvider()
+    {
+        return [
+            [Raspistill::WHITE_BALANCE_OFF],
+            [Raspistill::WHITE_BALANCE_AUTO],
+            [Raspistill::WHITE_BALANCE_SUN],
+            [Raspistill::WHITE_BALANCE_CLOUD],
+            [Raspistill::WHITE_BALANCE_SHADE],
+            [Raspistill::WHITE_BALANCE_TUNGSTEN],
+            [Raspistill::WHITE_BALANCE_FLUORESCENT],
+            [Raspistill::WHITE_BALANCE_INCANDESCENT],
+            [Raspistill::WHITE_BALANCE_FLASH],
+            [Raspistill::WHITE_BALANCE_HORIZON],
         ];
     }
 

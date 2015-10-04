@@ -179,6 +179,7 @@ class Raspistill extends Raspicam
      *  - 'fixedfps' Constrain fps to a fixed value
      *  - 'antishake' Antishake mode
      *  - 'fireworks' Select settings
+     * Note that not all of these settings may be implemented, depending on camera type.
      *
      * @param string $mode
      *
@@ -258,6 +259,48 @@ class Raspistill extends Raspicam
         }
 
         $this->valueArguments['timeout'] = $value * 1000; // convert to milliseconds
+
+        return $this;
+    }
+
+    /**
+     * Set Automatic White Balance (AWB) mode
+     *
+     * Possible options are:
+     *  - 'off' Turn off white balance calculation
+     *  - 'auto' Automatic mode (default)
+     *  - 'sun' Sunny mode
+     *  - 'cloud' Cloudy mode
+     *  - 'shade' Shaded mode
+     *  - 'tungsten' Tungsten lighting mode
+     *  - 'fluorescent' Fluorescent lighting mode
+     *  - 'incandescent' Incandescent lighting mode
+     *  - 'flash' Flash mode
+     *  - 'horizon' Horizon mode
+     * Note that not all of these settings may be implemented, depending on camera type.
+     *
+     * @param string $mode
+     *
+     * @return $this
+     */
+    public function whiteBalance($mode)
+    {
+        $awbModes = [
+            self::WHITE_BALANCE_OFF,
+            self::WHITE_BALANCE_AUTO,
+            self::WHITE_BALANCE_SUN,
+            self::WHITE_BALANCE_CLOUD,
+            self::WHITE_BALANCE_SHADE,
+            self::WHITE_BALANCE_TUNGSTEN,
+            self::WHITE_BALANCE_FLUORESCENT,
+            self::WHITE_BALANCE_INCANDESCENT,
+            self::WHITE_BALANCE_FLASH,
+            self::WHITE_BALANCE_HORIZON,
+        ];
+
+        $this->assertInArray($mode, $awbModes);
+
+        $this->valueArguments['awb'] = $mode;
 
         return $this;
     }

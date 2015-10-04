@@ -29,6 +29,17 @@ abstract class Raspicam
     const EXPOSURE_ANTISHAKE = 'antishake';
     const EXPOSURE_FIREWORKS = 'fireworks';
 
+    const WHITE_BALANCE_OFF = 'off';
+    const WHITE_BALANCE_AUTO = 'auto';
+    const WHITE_BALANCE_SUN = 'sun';
+    const WHITE_BALANCE_CLOUD = 'cloud';
+    const WHITE_BALANCE_SHADE = 'shade';
+    const WHITE_BALANCE_TUNGSTEN = 'tungsten';
+    const WHITE_BALANCE_FLUORESCENT = 'fluorescent';
+    const WHITE_BALANCE_INCANDESCENT = 'incandescent';
+    const WHITE_BALANCE_FLASH = 'flash';
+    const WHITE_BALANCE_HORIZON = 'horizon';
+
     /**
      * @var Runner
      */
@@ -82,6 +93,11 @@ abstract class Raspicam
         return $this;
     }
 
+    /**
+     * @param CommandInterface $command
+     *
+     * @throws CommandFailedException
+     */
     protected function execute(CommandInterface $command)
     {
         $runner = $this->getCommandRunner();
