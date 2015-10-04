@@ -165,6 +165,7 @@ class Raspistill extends Raspicam
 
     /**
      * Set exposure mode
+     *
      * Possible options are:
      *  - 'auto' Use automatic exposure mode
      *  - 'night' Select setting for night shooting
@@ -209,6 +210,7 @@ class Raspistill extends Raspicam
 
     /**
      * Set jpeg quality (0 to 100)
+     *
      * Quality 100 is almost completely uncompressed. 75 is a good all round value
      *
      * @param int $value
@@ -220,6 +222,22 @@ class Raspistill extends Raspicam
         $this->assertIntBetween($value, 0, 100);
 
         $this->valueArguments['quality'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Add raw bayer data to jpeg metadata
+     *
+     * This option inserts the raw Bayer data from the camera in to the JPEG metadata
+     *
+     * @param bool $value
+     *
+     * @return $this
+     */
+    public function raw($value = true)
+    {
+        $this->booleanArguments['raw'] = (bool) $value;
 
         return $this;
     }

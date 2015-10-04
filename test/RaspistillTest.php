@@ -304,6 +304,14 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->quality($quality);
     }
 
+    public function testRawSetsCorrectArgument()
+    {
+        $this->expectCommandContains('--raw');
+
+        $this->raspistill->raw();
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
     /**
      * @return array
      */
