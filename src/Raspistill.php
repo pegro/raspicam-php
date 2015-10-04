@@ -306,6 +306,72 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set an effect to be applied to the image
+     *
+     * Possible options are:
+     * - 'none' NO effect (default)
+     * - 'negative' Negate the image
+     * - 'solarise' Solarise the image
+     * - 'posterise' Posterise the image
+     * - 'whiteboard' Whiteboard effect
+     * - 'blackboard' Blackboard effect
+     * - 'sketch' Sketch style effect
+     * - 'denoise' Denoise the image
+     * - 'emboss' Emboss the image
+     * - 'oilpaint' Apply an oil paint style effect
+     * - 'hatch' Hatch sketch style
+     * - 'gpen'
+     * - 'pastel' A pastel style effect
+     * - 'watercolour' A watercolour style effect
+     * - 'film' Film grain style effect
+     * - 'blur' Blur the image
+     * - 'saturation' Colour saturate the image
+     * - 'colourswap' Not fully implemented
+     * - 'washedout' Not fully implemented
+     * - 'colourpoint' Not fully implemented
+     * - 'colourbalance' Not fully implemented
+     * - 'cartoon' Not fully implemented
+     * Note that not all of these settings may be available in all circumstances.
+     *
+     * @param string $mode
+     *
+     * @return $this
+     */
+    public function effect($mode)
+    {
+        $effectModes = [
+            self::EFFECT_NONE,
+            self::EFFECT_NEGATIVE,
+            self::EFFECT_SOLARISE,
+            self::EFFECT_POSTERISE,
+            self::EFFECT_WHITEBOARD,
+            self::EFFECT_BLACKBOARD,
+            self::EFFECT_SKETCH,
+            self::EFFECT_DENOISE,
+            self::EFFECT_EMBOSS,
+            self::EFFECT_OILPAINT,
+            self::EFFECT_HATCH,
+            self::EFFECT_GPEN,
+            self::EFFECT_PASTEL,
+            self::EFFECT_WATERCOLOUR,
+            self::EFFECT_FILM,
+            self::EFFECT_BLUR,
+            self::EFFECT_SATURATION,
+            self::EFFECT_COLOURSWAP,
+            self::EFFECT_WASHEDOUT,
+            self::EFFECT_COLOURPOINT,
+            self::EFFECT_COLOURBALANCE,
+            self::EFFECT_CARTOON,
+        ];
+
+        $this->assertInArray($mode, $effectModes);
+
+        $this->valueArguments['imxfx'] = $mode;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getExecutable()

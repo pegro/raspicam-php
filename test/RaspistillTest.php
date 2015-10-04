@@ -349,6 +349,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validEffectProvider
+     */
+    public function testEffectSetsCorrectArgument($effect)
+    {
+        $this->expectCommandContains("--imxfx '" . $effect . "'");
+
+        $this->raspistill->effect($effect);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidStringProvider
+     */
+    public function testInvalidEffectThrowsException($effect)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->effect($effect);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -518,6 +539,37 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [Raspistill::WHITE_BALANCE_INCANDESCENT],
             [Raspistill::WHITE_BALANCE_FLASH],
             [Raspistill::WHITE_BALANCE_HORIZON],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validEffectProvider()
+    {
+        return [
+            [Raspistill::EFFECT_NONE],
+            [Raspistill::EFFECT_NEGATIVE],
+            [Raspistill::EFFECT_SOLARISE],
+            [Raspistill::EFFECT_POSTERISE],
+            [Raspistill::EFFECT_WHITEBOARD],
+            [Raspistill::EFFECT_BLACKBOARD],
+            [Raspistill::EFFECT_SKETCH],
+            [Raspistill::EFFECT_DENOISE],
+            [Raspistill::EFFECT_EMBOSS],
+            [Raspistill::EFFECT_OILPAINT],
+            [Raspistill::EFFECT_HATCH],
+            [Raspistill::EFFECT_GPEN],
+            [Raspistill::EFFECT_PASTEL],
+            [Raspistill::EFFECT_WATERCOLOUR],
+            [Raspistill::EFFECT_FILM],
+            [Raspistill::EFFECT_BLUR],
+            [Raspistill::EFFECT_SATURATION],
+            [Raspistill::EFFECT_COLOURSWAP],
+            [Raspistill::EFFECT_WASHEDOUT],
+            [Raspistill::EFFECT_COLOURPOINT],
+            [Raspistill::EFFECT_COLOURBALANCE],
+            [Raspistill::EFFECT_CARTOON],
         ];
     }
 

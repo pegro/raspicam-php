@@ -40,6 +40,29 @@ abstract class Raspicam
     const WHITE_BALANCE_FLASH = 'flash';
     const WHITE_BALANCE_HORIZON = 'horizon';
 
+    const EFFECT_NONE = 'none';
+    const EFFECT_NEGATIVE = 'negative';
+    const EFFECT_SOLARISE = 'solarise';
+    const EFFECT_POSTERISE = 'posterise';
+    const EFFECT_WHITEBOARD = 'whiteboard';
+    const EFFECT_BLACKBOARD = 'blackboard';
+    const EFFECT_SKETCH = 'sketch';
+    const EFFECT_DENOISE = 'denoise';
+    const EFFECT_EMBOSS = 'emboss';
+    const EFFECT_OILPAINT = 'oilpaint';
+    const EFFECT_HATCH = 'hatch';
+    const EFFECT_GPEN = 'gpen';
+    const EFFECT_PASTEL = 'pastel';
+    const EFFECT_WATERCOLOUR = 'watercolour';
+    const EFFECT_FILM = 'film';
+    const EFFECT_BLUR = 'blur';
+    const EFFECT_SATURATION = 'saturation';
+    const EFFECT_COLOURSWAP = 'colourswap';
+    const EFFECT_WASHEDOUT = 'washedout';
+    const EFFECT_COLOURPOINT = 'colourpoint';
+    const EFFECT_COLOURBALANCE = 'colourbalance';
+    const EFFECT_CARTOON = 'cartoon';
+
     /**
      * @var Runner
      */
