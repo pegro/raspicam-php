@@ -403,6 +403,31 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set image rotation
+     *
+     * Only 0, 90, 180 and 270 degree rotations are supported.
+     *
+     * @param int $degrees
+     *
+     * @return $this
+     */
+    public function rotate($degrees)
+    {
+        $supportedRotations = [
+            0,
+            90,
+            180,
+            270,
+        ];
+
+        $this->assertInArray($degrees, $supportedRotations);
+
+        $this->valueArguments['rotation'] = $degrees;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getExecutable()

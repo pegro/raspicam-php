@@ -391,6 +391,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validRotateProvider
+     */
+    public function testRotateSetsCorrectArgument($rotate)
+    {
+        $this->expectCommandContains("--rotation '" . $rotate . "'");
+
+        $this->raspistill->rotate($rotate);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidRotateProvider
+     */
+    public function testInvalidRotateThrowsException($rotate)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->rotate($rotate);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -617,6 +638,38 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ['%¤"*-@'],
             [1],
             [0],
+            [-11],
+            [5.5],
+            [-2.0],
+            [false],
+            [null],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validRotateProvider()
+    {
+        return [
+            [0],
+            [90],
+            [180],
+            [270],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidRotateProvider()
+    {
+        return [
+            ['foo'],
+            ['%¤"*-@'],
+            ['90'],
+            [1],
+            [10],
             [-11],
             [5.5],
             [-2.0],
