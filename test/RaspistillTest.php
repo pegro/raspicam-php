@@ -6,6 +6,7 @@ use AdamBrett\ShellWrapper\Command\CommandInterface;
 use AdamBrett\ShellWrapper\ExitCodes;
 use AdamBrett\ShellWrapper\Runners\Exec;
 use Cvuorinen\Raspicam\CommandFailedException;
+use Cvuorinen\Raspicam\Raspicam;
 use Cvuorinen\Raspicam\Raspistill;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
@@ -312,11 +313,14 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->takePicture('foo.jpg');
     }
 
-    public function testTimeoutSetsCorrectArgument()
+    /**
+     * @dataProvider timeoutProvider
+     */
+    public function testTimeoutSetsCorrectArgument($value, $unit, $expected)
     {
-        $this->expectCommandContains("--timeout '2000'");
+        $this->expectCommandContains("--timeout '" . $expected . "'");
 
-        $this->raspistill->timeout(2);
+        $this->raspistill->timeout($value, $unit);
         $this->raspistill->takePicture('foo.jpg');
     }
 
@@ -325,6 +329,19 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->setExpectedException('InvalidArgumentException');
 
         $this->raspistill->timeout(-2);
+    }
+
+    /**
+     * @return array
+     */
+    public function timeoutProvider()
+    {
+        return [
+            ['value' => 2, 'unit' => Raspicam::TIMEUNIT_SECOND, 'expected' => 2000],
+            ['value' => 1.54, 'unit' => Raspicam::TIMEUNIT_SECOND, 'expected' => 1540],
+            ['value' => 4000, 'unit' => Raspicam::TIMEUNIT_MILLISECOND, 'expected' => 4000],
+            ['value' => 5000000, 'unit' => Raspicam::TIMEUNIT_MICROSECOND, 'expected' => 5000],
+        ];
     }
 
     /**
@@ -409,6 +426,34 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->setExpectedException('InvalidArgumentException');
 
         $this->raspistill->rotate($rotate);
+    }
+
+    /**
+     * @dataProvider shutterSpeedProvider
+     */
+    public function testShutterSpeedSetsCorrectArgument($value, $unit, $expected)
+    {
+        $this->expectCommandContains("--shutter '" . $expected . "'");
+
+        $this->raspistill->shutterSpeed($value, $unit);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidPositiveNumberProvider
+     */
+    public function testInvalidShutterSpeedThrowsException($shutter)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->shutterSpeed($shutter);
+    }
+
+    public function testInvalidTimeUnitThrowsException()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->shutterSpeed(1, 'foo');
     }
 
     /**
@@ -537,6 +582,34 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [-99],
             [-11],
             [5.5],
+            [-2.0],
+            [false],
+            [null],
+            ['foo']
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function shutterSpeedProvider()
+    {
+        return [
+            ['value' => 2, 'unit' => Raspicam::TIMEUNIT_SECOND, 'expected' => 2000000],
+            ['value' => 1.54, 'unit' => Raspicam::TIMEUNIT_SECOND, 'expected' => 1540000],
+            ['value' => 4000, 'unit' => Raspicam::TIMEUNIT_MILLISECOND, 'expected' => 4000000],
+            ['value' => 5000000, 'unit' => Raspicam::TIMEUNIT_MICROSECOND, 'expected' => 5000000],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidPositiveNumberProvider()
+    {
+        return [
+            [-99],
+            [-11],
             [-2.0],
             [false],
             [null],

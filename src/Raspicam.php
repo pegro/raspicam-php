@@ -68,6 +68,10 @@ abstract class Raspicam
     const METERING_BACKLIT = 'backlit';
     const METERING_MATRIX = 'matrix';
 
+    const TIMEUNIT_SECOND = 's';
+    const TIMEUNIT_MILLISECOND = 'ms';
+    const TIMEUNIT_MICROSECOND = 'us';
+
     /**
      * @var Runner
      */

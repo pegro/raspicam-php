@@ -246,21 +246,25 @@ class Raspistill extends Raspicam
     }
 
     /**
-     * Time in seconds before takes picture, default is 5
+     * Time before takes picture, default is 5 seconds
      *
      * The camera will run for this length of time, then take the picture.
+     * Unit can be one of: Raspicam::TIMEUNIT_SECOND, Raspicam::TIMEUNIT_MILLISECOND, Raspicam::TIMEUNIT_MICROSECOND
      *
-     * @param int $value
+     * @param int|float $value
+     * @param string    $unit
      *
      * @return $this
      */
-    public function timeout($value)
+    public function timeout($value, $unit = self::TIMEUNIT_SECOND)
     {
-        if (!is_int($value) || $value < 0) {
-            throw new \InvalidArgumentException('Expected positive integer');
-        }
+        $this->assertPositiveNumber($value);
 
-        $this->valueArguments['timeout'] = $value * 1000; // convert to milliseconds
+        $this->valueArguments['timeout'] = $this->convertTimeUnit(
+            $value,
+            $unit,
+            self::TIMEUNIT_MILLISECOND
+        );
 
         return $this;
     }
@@ -428,6 +432,30 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set the shutter speed to the specified time.
+     *
+     * There is currently an upper limit of approximately 6000000us (6000ms, 6s) past which operation is undefined.
+     * Unit can be one of: Raspicam::TIMEUNIT_SECOND, Raspicam::TIMEUNIT_MILLISECOND, Raspicam::TIMEUNIT_MICROSECOND
+     *
+     * @param int    $value
+     * @param string $unit
+     *
+     * @return $this
+     */
+    public function shutterSpeed($value, $unit = self::TIMEUNIT_SECOND)
+    {
+        $this->assertPositiveNumber($value);
+
+        $this->valueArguments['shutter'] = $this->convertTimeUnit(
+            $value,
+            $unit,
+            self::TIMEUNIT_MICROSECOND
+        );
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getExecutable()
@@ -496,5 +524,59 @@ class Raspistill extends Raspicam
                 sprintf('Expected value to be one of [%s]', implode(', ', $validValues))
             );
         }
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function assertPositiveNumber($value)
+    {
+        if ((!is_int($value) && !is_float($value)) || $value < 0) {
+            throw new \InvalidArgumentException('Expected value to be positive number');
+        }
+    }
+
+    /**
+     * @param int|float $value
+     * @param string    $inputUnit
+     * @param string    $outputUnit
+     *
+     * @return int
+     */
+    private function convertTimeUnit($value, $inputUnit, $outputUnit)
+    {
+        switch ($inputUnit) {
+            case self::TIMEUNIT_SECOND:
+                $modifier = 1000000;
+                break;
+            case self::TIMEUNIT_MILLISECOND:
+                $modifier = 1000;
+                break;
+            case self::TIMEUNIT_MICROSECOND:
+                $modifier = 1;
+                break;
+            default:
+                throw new \InvalidArgumentException(
+                    sprintf('Invalid time unit \'%s\'', $inputUnit)
+                );
+        }
+
+        switch ($outputUnit) {
+            case self::TIMEUNIT_SECOND:
+                $modifier /= 1000000;
+                break;
+            case self::TIMEUNIT_MILLISECOND:
+                $modifier /= 1000;
+                break;
+            case self::TIMEUNIT_MICROSECOND:
+                $modifier /= 1;
+                break;
+            default:
+                throw new \InvalidArgumentException(
+                    sprintf('Invalid time unit \'%s\'', $outputUnit)
+                );
+        }
+
+        return (int) ceil($value * $modifier);
     }
 }
