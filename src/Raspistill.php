@@ -8,6 +8,8 @@ use AdamBrett\ShellWrapper\Command\CommandInterface;
  * Class that abstracts the usage of raspistill cli utility that is used to take photos with the
  * Raspberry Pi camera module.
  *
+ * @see https://www.raspberrypi.org/documentation/raspbian/applications/camera.md
+ *
  * @package Cvuorinen\Raspicam
  */
 class Raspistill extends Raspicam
@@ -367,6 +369,35 @@ class Raspistill extends Raspicam
         $this->assertInArray($mode, $effectModes);
 
         $this->valueArguments['imxfx'] = $mode;
+
+        return $this;
+    }
+
+    /**
+     * Set metering mode
+     *
+     * Possible options are:
+     * - 'average' Average the whole frame for metering
+     * - 'spot' Spot metering
+     * - 'backlit' Assume a backlit image
+     * - 'matrix' Matrix metering
+     *
+     * @param string $mode
+     *
+     * @return $this
+     */
+    public function metering($mode)
+    {
+        $meteringModes = [
+            self::METERING_AVERAGE,
+            self::METERING_SPOT,
+            self::METERING_BACKLIT,
+            self::METERING_MATRIX,
+        ];
+
+        $this->assertInArray($mode, $meteringModes);
+
+        $this->valueArguments['metering'] = $mode;
 
         return $this;
     }

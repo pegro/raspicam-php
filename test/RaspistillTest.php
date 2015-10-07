@@ -370,6 +370,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validMeteringProvider
+     */
+    public function testMeteringSetsCorrectArgument($metering)
+    {
+        $this->expectCommandContains("--metering '" . $metering . "'");
+
+        $this->raspistill->metering($metering);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidStringProvider
+     */
+    public function testInvalidMeteringThrowsException($metering)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->metering($metering);
+    }
+
+    /**
      * @return array
      */
     public function validIntegerBetweenNegativeHundredAndHundredProvider()
@@ -570,6 +591,19 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [Raspistill::EFFECT_COLOURPOINT],
             [Raspistill::EFFECT_COLOURBALANCE],
             [Raspistill::EFFECT_CARTOON],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validMeteringProvider()
+    {
+        return [
+            [Raspistill::METERING_AVERAGE],
+            [Raspistill::METERING_SPOT],
+            [Raspistill::METERING_BACKLIT],
+            [Raspistill::METERING_MATRIX],
         ];
     }
 

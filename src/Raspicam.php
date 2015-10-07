@@ -10,7 +10,7 @@ use AdamBrett\ShellWrapper\Runners\ReturnValue;
 use AdamBrett\ShellWrapper\Runners\Runner;
 
 /**
- * Abstracts some common functionality related to cli commands
+ * Abstracts some common functionality related to al of the camera commands
  *
  * @package Cvuorinen\Raspicam
  */
@@ -62,6 +62,11 @@ abstract class Raspicam
     const EFFECT_COLOURPOINT = 'colourpoint';
     const EFFECT_COLOURBALANCE = 'colourbalance';
     const EFFECT_CARTOON = 'cartoon';
+
+    const METERING_AVERAGE = 'average';
+    const METERING_SPOT = 'spot';
+    const METERING_BACKLIT = 'backlit';
+    const METERING_MATRIX = 'matrix';
 
     /**
      * @var Runner
