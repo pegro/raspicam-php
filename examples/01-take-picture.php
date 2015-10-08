@@ -27,7 +27,10 @@ $camera->takePicture('pic2.jpg');
 // Configure camera with a constructor parameter
 $camera2 = new Raspistill([
     'timeout' => 2.5,
+    'raw' => true,
     'rotate' => 90,
+    'width' => 640,
+    'height' => 480,
     'exposure' => Raspistill::EXPOSURE_NIGHT,
     'sharpness' => 85,
 ]);
