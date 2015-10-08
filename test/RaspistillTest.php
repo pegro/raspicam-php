@@ -456,6 +456,36 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->shutterSpeed(1, 'foo');
     }
 
+    public function testConstructorArraySetsCorrectArguments()
+    {
+        $options = [
+            'flip' => true,
+            'contrast' => 50,
+            'ISO' => 500,
+            'exposure' => Raspistill::EXPOSURE_NIGHT,
+            'shutterSpeed' => 1.5
+        ];
+
+        $expectedArguments = [
+            '--vflip',
+            '--hflip',
+            '--contrast',
+            '--ISO',
+            '--exposure',
+            '--shutterSpeed',
+        ];
+
+        $raspistill = new Raspistill($options);
+
+        $raspistill->setCommandRunner(
+            $this->commandRunner
+        );
+
+        $this->expectCommandContains($expectedArguments);
+
+        $raspistill->takePicture('foo.jpg');
+    }
+
     /**
      * @return array
      */

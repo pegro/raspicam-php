@@ -27,6 +27,20 @@ class Raspistill extends Raspicam
     protected $valueArguments = [];
 
     /**
+     * @param array $options
+     */
+    public function __construct(array $options = [])
+    {
+        foreach ($options as $key => $value) {
+            $method = [$this, $key];
+
+            if (is_callable($method)) {
+                call_user_func($method, $value);
+            }
+        }
+    }
+
+    /**
      * Flips the image both vertically and horizontally
      *
      * @param bool $value

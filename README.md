@@ -41,8 +41,6 @@ require 'vendor/autoload.php';
 
 # Usage
 
-More complete examples can be found in the [examples](examples) directory.
-
 ## Take picture
 
 ```php
@@ -53,7 +51,36 @@ $camera = new Raspistill();
 $camera->takePicture('pic.jpg');
 ```
 
-TODO
+### Fluent interface
+
+```php
+use Cvuorinen\Raspicam\Raspistill;
+
+$camera = new Raspistill();
+$camera->timeout(1)
+    ->rotate(90)
+    ->exposure(Raspistill::EXPOSURE_NIGHT)
+    ->quality(85);
+
+$camera->takePicture('pic.jpg');
+```
+
+### Constructor options array
+
+```php
+use Cvuorinen\Raspicam\Raspistill;
+
+$camera = new Raspistill([
+    'timeout' => 1,
+    'rotate' => 90,
+    'exposure' => Raspistill::EXPOSURE_NIGHT,
+    'quality' => 85,
+]);
+
+$camera->takePicture('pic.jpg');
+```
+
+More complex examples can be found in the [examples](examples) directory.
 
 # License
 
