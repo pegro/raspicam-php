@@ -714,6 +714,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     public function invalidPositiveNumberProvider()
     {
         return [
+            [0],
             [-99],
             [-11],
             [-2.0],

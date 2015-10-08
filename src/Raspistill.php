@@ -579,7 +579,7 @@ class Raspistill extends Raspicam
      */
     private function assertPositiveNumber($value)
     {
-        if ((!is_int($value) && !is_float($value)) || $value < 0) {
+        if ((!is_int($value) && !is_float($value)) || $value <= 0) {
             throw new \InvalidArgumentException('Expected value to be positive number');
         }
     }
