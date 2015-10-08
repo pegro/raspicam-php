@@ -457,7 +457,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider validWidthProvider
+     * @dataProvider validResolutionProvider
      */
     public function testWidthSetsCorrectArgument($width)
     {
@@ -468,7 +468,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider invalidWidthProvider
+     * @dataProvider invalidResolutionProvider
      */
     public function testInvalidWidthThrowsException($width)
     {
@@ -478,9 +478,30 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validResolutionProvider
+     */
+    public function testHeightSetsCorrectArgument($height)
+    {
+        $this->expectCommandContains("--height '" . $height . "'");
+
+        $this->raspistill->height($height);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidResolutionProvider
+     */
+    public function testInvalidHeightThrowsException($height)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->height($height);
+    }
+
+    /**
      * @return array
      */
-    public function validWidthProvider()
+    public function validResolutionProvider()
     {
         return [
             [16],
@@ -495,13 +516,13 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function invalidWidthProvider()
+    public function invalidResolutionProvider()
     {
         return [
             [0],
             [1],
             [15],
-            [15000],
+            [25000],
             [-999],
             [100.5],
             [-12.0],

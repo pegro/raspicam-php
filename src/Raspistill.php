@@ -470,7 +470,7 @@ class Raspistill extends Raspicam
     }
 
     /**
-     * Set image width
+     * Set image width in pixels
      *
      * @param int $value
      *
@@ -478,9 +478,27 @@ class Raspistill extends Raspicam
      */
     public function width($value)
     {
+        // Documentation doesn't mention min/max values, so these are based on my own testing
         $this->assertIntBetween($value, 16, 9000);
 
         $this->valueArguments['width'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set image height in pixels
+     *
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function height($value)
+    {
+        // Documentation doesn't mention min/max values, so these are based on my own testing
+        $this->assertIntBetween($value, 16, 20000);
+
+        $this->valueArguments['height'] = $value;
 
         return $this;
     }
