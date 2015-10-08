@@ -470,6 +470,22 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set image width
+     *
+     * @param int $value
+     *
+     * @return $this
+     */
+    public function width($value)
+    {
+        $this->assertIntBetween($value, 16, 9000);
+
+        $this->valueArguments['width'] = $value;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getExecutable()

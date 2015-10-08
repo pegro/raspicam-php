@@ -456,6 +456,61 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->shutterSpeed(1, 'foo');
     }
 
+    /**
+     * @dataProvider validWidthProvider
+     */
+    public function testWidthSetsCorrectArgument($width)
+    {
+        $this->expectCommandContains("--width '" . $width . "'");
+
+        $this->raspistill->width($width);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidWidthProvider
+     */
+    public function testInvalidWidthThrowsException($width)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->width($width);
+    }
+
+    /**
+     * @return array
+     */
+    public function validWidthProvider()
+    {
+        return [
+            [16],
+            [600],
+            [1600],
+            [1920],
+            [2592],
+            [5000],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidWidthProvider()
+    {
+        return [
+            [0],
+            [1],
+            [15],
+            [15000],
+            [-999],
+            [100.5],
+            [-12.0],
+            [false],
+            [null],
+            ['foo'],
+        ];
+    }
+
     public function testConstructorArraySetsCorrectArguments()
     {
         $options = [
@@ -472,7 +527,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             '--contrast',
             '--ISO',
             '--exposure',
-            '--shutterSpeed',
+            '--shutter',
         ];
 
         $raspistill = new Raspistill($options);
