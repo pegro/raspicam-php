@@ -429,6 +429,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validEncodingProvider
+     */
+    public function testEncodingSetsCorrectArgument($encoding)
+    {
+        $this->expectCommandContains("--encoding '" . $encoding . "'");
+
+        $this->raspistill->encoding($encoding);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidStringProvider
+     */
+    public function testInvalidEncodingThrowsException($encoding)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->encoding($encoding);
+    }
+
+    /**
      * @dataProvider validRotateProvider
      */
     public function testRotateSetsCorrectArgument($rotate)
@@ -839,6 +860,19 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [Raspistill::DRC_LOW],
             [Raspistill::DRC_MEDIUM],
             [Raspistill::DRC_HIGH],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validEncodingProvider()
+    {
+        return [
+            [Raspistill::ENCODING_JPG],
+            [Raspistill::ENCODING_BMP],
+            [Raspistill::ENCODING_GIF],
+            [Raspistill::ENCODING_PNG],
         ];
     }
 

@@ -73,6 +73,11 @@ abstract class Raspicam
     const DRC_MEDIUM = 'medium';
     const DRC_HIGH = 'high';
 
+    const ENCODING_JPG = 'jpg';
+    const ENCODING_BMP = 'bmp';
+    const ENCODING_GIF = 'gif';
+    const ENCODING_PNG = 'png';
+
     const TIMEUNIT_SECOND = 's';
     const TIMEUNIT_MILLISECOND = 'ms';
     const TIMEUNIT_MICROSECOND = 'us';

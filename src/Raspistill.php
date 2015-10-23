@@ -453,6 +453,38 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Encoding to use for output file
+     *
+     * Note that unaccelerated image types (gif, png, bmp) will take much longer to save than JPG which is hardware
+     * accelerated. Also note that the filename suffix is completely ignored when deciding the encoding of a file.
+     *
+     * Possible options are:
+     * - 'jpg' (default)
+     * - 'bmp'
+     * - 'gif'
+     * - 'png'
+     *
+     * @param string $mode
+     *
+     * @return $this
+     */
+    public function encoding($mode)
+    {
+        $encodings = [
+            self::ENCODING_JPG,
+            self::ENCODING_BMP,
+            self::ENCODING_GIF,
+            self::ENCODING_PNG,
+        ];
+
+        $this->assertInArray($mode, $encodings);
+
+        $this->valueArguments['encoding'] = $mode;
+
+        return $this;
+    }
+
+    /**
      * Set image rotation
      *
      * Only 0, 90, 180 and 270 degree rotations are supported.
