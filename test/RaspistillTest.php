@@ -408,6 +408,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validDrcProvider
+     */
+    public function testDynamicRangeCompressionSetsCorrectArgument($drc)
+    {
+        $this->expectCommandContains("--drc '" . $drc . "'");
+
+        $this->raspistill->dynamicRangeCompression($drc);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidStringProvider
+     */
+    public function testInvalidDynamicRangeCompressionThrowsException($drc)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->dynamicRangeCompression($drc);
+    }
+
+    /**
      * @dataProvider validRotateProvider
      */
     public function testRotateSetsCorrectArgument($rotate)
@@ -805,6 +826,19 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [Raspistill::METERING_SPOT],
             [Raspistill::METERING_BACKLIT],
             [Raspistill::METERING_MATRIX],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validDrcProvider()
+    {
+        return [
+            [Raspistill::DRC_OFF],
+            [Raspistill::DRC_LOW],
+            [Raspistill::DRC_MEDIUM],
+            [Raspistill::DRC_HIGH],
         ];
     }
 

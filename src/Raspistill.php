@@ -421,6 +421,38 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Enable/Disable Dynamic Range compression
+     *
+     * DRC changes the images by increasing the range of dark areas of the image, and decreasing the brighter areas.
+     * This can improve the image in low light areas.
+     *
+     * Possible options are:
+     * - 'off' (default)
+     * - 'low'
+     * - 'medium'
+     * - 'high'
+     *
+     * @param string $mode
+     *
+     * @return $this
+     */
+    public function dynamicRangeCompression($mode)
+    {
+        $drcModes = [
+            self::DRC_OFF,
+            self::DRC_LOW,
+            self::DRC_MEDIUM,
+            self::DRC_HIGH,
+        ];
+
+        $this->assertInArray($mode, $drcModes);
+
+        $this->valueArguments['drc'] = $mode;
+
+        return $this;
+    }
+
+    /**
      * Set image rotation
      *
      * Only 0, 90, 180 and 270 degree rotations are supported.

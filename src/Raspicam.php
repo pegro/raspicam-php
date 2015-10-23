@@ -68,6 +68,11 @@ abstract class Raspicam
     const METERING_BACKLIT = 'backlit';
     const METERING_MATRIX = 'matrix';
 
+    const DRC_OFF = 'off';
+    const DRC_LOW = 'low';
+    const DRC_MEDIUM = 'medium';
+    const DRC_HIGH = 'high';
+
     const TIMEUNIT_SECOND = 's';
     const TIMEUNIT_MILLISECOND = 'ms';
     const TIMEUNIT_MICROSECOND = 'us';
