@@ -541,6 +541,56 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validSensorModeProvider
+     */
+    public function testSensorModeSetsCorrectArgument($mode)
+    {
+        $this->expectCommandContains("--mode '" . $mode . "'");
+
+        $this->raspistill->sensorMode($mode);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidSensorModeProvider
+     */
+    public function testInvalidSensorModeThrowsException($mode)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->sensorMode($mode);
+    }
+
+    /**
+     * @return array
+     */
+    public function validSensorModeProvider()
+    {
+        return [
+            [0],
+            [1],
+            [5],
+            [7],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidSensorModeProvider()
+    {
+        return [
+            [-1],
+            [15],
+            [1.5],
+            [-12.0],
+            [false],
+            [null],
+            ['foo'],
+        ];
+    }
+
+    /**
      * @return array
      */
     public function validResolutionProvider()
