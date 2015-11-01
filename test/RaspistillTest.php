@@ -675,6 +675,32 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->takePicture('foo.jpg');
     }
 
+    public function testStartTimelapseExecutesCommand()
+    {
+        $this->commandRunner
+            ->expects($this->once())
+            ->method('run');
+
+        $this->raspistill->startTimelapse('foo%04d.jpg', 5, 60);
+    }
+
+    public function testStartTimelapseSetsCorrectArguments()
+    {
+        $filename = 'foo%04d.jpg';
+        $interval = 5;
+        $length = 60;
+
+        $expectedArguments = [
+            "--output '" . $filename . "'",
+            "--timelapse '" . ($interval * 1000) . "'",
+            "--timeout '" . ($length * 1000) . "'",
+        ];
+
+        $this->expectCommandContains($expectedArguments);
+
+        $this->raspistill->startTimelapse($filename, $interval, $length);
+    }
+
     /**
      * @return array
      */

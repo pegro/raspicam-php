@@ -147,6 +147,8 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Take a picture and save with the given filename
+     *
      * @param string $filename
      */
     public function takePicture($filename)
@@ -155,10 +157,62 @@ class Raspistill extends Raspicam
             throw new \InvalidArgumentException('Filename required');
         }
 
+        # TODO check filepath and create missing dirs?
+
         $this->valueArguments['output'] = $filename;
 
         $this->execute(
             $this->buildCommand()
         );
+    }
+
+    /**
+     * Take pictures with timelapse mode.
+     *
+     * Note you should specify %04d at the point in the filename where you want a frame count number to appear.
+     * e.g. 'image%04d.jpg'. Note that the %04d indicates a 4 digit number with leading zero's added to pad to the
+     * required number of digits. So, for example, %08d would result in an 8 digit number.
+     *
+     * If a timelapse value of 0 is entered, the application will take pictures as fast as possible. Note there is an
+     * minimum enforced pause of 30ms between captures to ensure that exposure calculations can be made.
+     *
+     * @param string    $filename
+     * @param int|float $interval Time between shots.
+     * @param int|float $length   Time how long to keep taking pictures.
+     * @param string    $timeUnit
+     */
+    public function startTimelapse($filename, $interval, $length, $timeUnit = self::TIMEUNIT_SECOND)
+    {
+        if (empty($filename)) {
+            throw new \InvalidArgumentException('Filename required');
+        }
+
+        $this->valueArguments['output'] = $filename;
+
+        $this->timeout($length, $timeUnit);
+        $this->timelapse($interval, $timeUnit);
+
+        $this->execute(
+            $this->buildCommand()
+        );
+    }
+
+    /**
+     * @param int|float $value
+     * @param string    $unit
+     *
+     * @return $this
+     */
+    private function timelapse($value, $unit = self::TIMEUNIT_SECOND)
+    {
+        $this->assertPositiveNumber($value);
+
+        $this->valueArguments['timelapse'] = $this->convertTimeUnit(
+            $value,
+            $unit,
+            self::TIMEUNIT_MILLISECOND
+        );
+
+        return $this;
     }
 }
