@@ -654,6 +654,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $raspistill->takePicture('foo.jpg');
     }
 
+    public function testFluentInterfaceSetsCorrectArguments()
+    {
+        $expectedArguments = [
+            '--vflip',
+            '--hflip',
+            '--contrast',
+            '--ISO',
+            '--exposure',
+            '--shutter',
+        ];
+
+        $this->expectCommandContains($expectedArguments);
+
+        $this->raspistill->flip()
+            ->contrast(50)
+            ->ISO(500)
+            ->exposure(Raspistill::EXPOSURE_NIGHT)
+            ->shutterSpeed(1.5)
+            ->takePicture('foo.jpg');
+    }
+
     /**
      * @return array
      */
