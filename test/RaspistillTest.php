@@ -835,6 +835,22 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->startTimelapse('', 5, 30);
     }
 
+    public function testLinkLatestSetsCorrectArgument()
+    {
+        $filename = 'latest.jpg';
+        $this->expectCommandContains("--latest '" . $filename . "'");
+
+        $this->raspistill->linkLatest($filename);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    public function testLinkLatestThrowsExceptionOnEmptyFilename()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->linkLatest('');
+    }
+
     /**
      * @return array
      */

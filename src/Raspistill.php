@@ -221,6 +221,26 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Link latest frame to filename.
+     *
+     * Make a file system link under this name to the latest frame.
+     *
+     * @param string $filename
+     *
+     * @return $this
+     */
+    public function linkLatest($filename)
+    {
+        if (empty($filename)) {
+            throw new \InvalidArgumentException('Filename required');
+        }
+
+        $this->valueArguments['latest'] = $filename;
+
+        return $this;
+    }
+
+    /**
      * Take a picture and save with the given filename
      *
      * @param string $filename
