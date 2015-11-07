@@ -80,6 +80,17 @@ $camera = new Raspistill([
 $camera->takePicture('pic.jpg');
 ```
 
+## Timelapse
+
+```php
+use Cvuorinen\Raspicam\Raspistill;
+
+$camera = new Raspistill();
+
+// take picture every ten seconds for two minutes
+$camera->startTimelapse('image%04d.jpg', 10, 120);
+```
+
 More complex examples can be found in the [examples](examples) directory.
 
 # License

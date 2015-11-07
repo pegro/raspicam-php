@@ -6,7 +6,7 @@ use Cvuorinen\Raspicam\Raspistill;
 
 $camera = new Raspistill();
 
-// Take picture with default values
+// Take picture with default configurations
 $camera->takePicture('pic1.jpg');
 
 // Configure camera with fluent interface
@@ -24,7 +24,7 @@ $camera->flip()
 
 $camera->takePicture('pic2.jpg');
 
-// Configure camera with a constructor parameter
+// Configure camera with a constructor parameter array
 $camera2 = new Raspistill([
     'timeout' => 2.5,
     'raw' => true,

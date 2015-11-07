@@ -78,6 +78,7 @@ abstract class Raspicam
     const ENCODING_GIF = 'gif';
     const ENCODING_PNG = 'png';
 
+    const TIMEUNIT_MINUTE = 'm';
     const TIMEUNIT_SECOND = 's';
     const TIMEUNIT_MILLISECOND = 'ms';
     const TIMEUNIT_MICROSECOND = 'us';
@@ -708,6 +709,9 @@ abstract class Raspicam
     protected function convertTimeUnit($value, $inputUnit, $outputUnit)
     {
         switch ($inputUnit) {
+            case self::TIMEUNIT_MINUTE:
+                $modifier = 60000000;
+                break;
             case self::TIMEUNIT_SECOND:
                 $modifier = 1000000;
                 break;
@@ -719,7 +723,7 @@ abstract class Raspicam
                 break;
             default:
                 throw new \InvalidArgumentException(
-                    sprintf('Invalid time unit \'%s\'', $inputUnit)
+                    sprintf('Invalid input time unit \'%s\'', $inputUnit)
                 );
         }
 
@@ -735,7 +739,7 @@ abstract class Raspicam
                 break;
             default:
                 throw new \InvalidArgumentException(
-                    sprintf('Invalid time unit \'%s\'', $outputUnit)
+                    sprintf('Invalid output time unit \'%s\'', $outputUnit)
                 );
         }
 

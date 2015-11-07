@@ -810,6 +810,24 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->raspistill->startTimelapse($filename, $interval, $length);
     }
 
+    public function testStartTimelapseConvertsTimeUnits()
+    {
+        $filename = 'foo%04d.jpg';
+        $interval = 1;
+        $length = 60;
+        $unit = Raspicam::TIMEUNIT_MINUTE;
+
+        $expectedArguments = [
+            "--output '" . $filename . "'",
+            "--timelapse '" . ($interval * 1000 * 60) . "'",
+            "--timeout '" . ($length * 1000 * 60) . "'",
+        ];
+
+        $this->expectCommandContains($expectedArguments);
+
+        $this->raspistill->startTimelapse($filename, $interval, $length, $unit);
+    }
+
     public function testStartTimelapseThrowsExceptionOnEmptyFilename()
     {
         $this->setExpectedException('InvalidArgumentException');
