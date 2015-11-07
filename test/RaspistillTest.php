@@ -591,6 +591,115 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validExifProvider
+     */
+    public function testAddExifSetsCorrectArgument($tagName, $value)
+    {
+        $this->expectCommandContains("--exif '" . $tagName . "=" . $value . "'");
+
+        $this->raspistill->addExif($tagName, $value);
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @dataProvider invalidExifProvider
+     */
+    public function testInvalidAddExifThrowsException($tagName, $value)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->addExif($tagName, $value);
+    }
+
+    public function testAddExifThrowsExceptionWhenTooManyTags()
+    {
+        $this->setExpectedException('OverflowException');
+
+        for ($i = 0; $i < 33; $i++) {
+            $this->raspistill->addExif('EXIF.MakerNote' . $i, 'Testing');
+        }
+    }
+
+    public function testAddExifSetsMultipleArguments()
+    {
+        $tags = [
+            'IFD0.Artist' => 'Boris',
+            'GPS.GPSAltitude' => '1235/10',
+            'EXIF.MakerNote' => 'Testing',
+        ];
+
+        $expectedArgs = [];
+
+        foreach ($tags as $tagName => $value) {
+            $expectedArgs[] = "--exif '" . $tagName . "=" . $value . "'";
+
+            $this->raspistill->addExif($tagName, $value);
+        }
+
+        $this->expectCommandContains($expectedArgs);
+
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    public function testSetExifSetsMultipleArguments()
+    {
+        $tags = [
+            'IFD0.Artist' => 'Boris',
+            'GPS.GPSAltitude' => '1235/10',
+            'EXIF.MakerNote' => 'Testing',
+        ];
+
+        $expectedArgs = [];
+
+        foreach ($tags as $tagName => $value) {
+            $expectedArgs[] = "--exif '" . $tagName . "=" . $value . "'";
+        }
+
+        $this->raspistill->setExif($tags);
+
+        $this->expectCommandContains($expectedArgs);
+
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    public function testDisableExifSetsCorrectArgument()
+    {
+        $this->expectCommandContains("--exif 'none'");
+
+        $this->raspistill->disableExif();
+        $this->raspistill->takePicture('foo.jpg');
+    }
+
+    /**
+     * @return array
+     */
+    public function validExifProvider()
+    {
+        return [
+            ['EXIF.UserComment', 'testing'],
+            ['EXIF.ExposureTime', 500],
+            ['IDF0.Artist', 'Boris'],
+            ['GPS.GPSAltitude', '1235/10'],
+            ['GPS.GPSAltitude', '0'],
+            ['GPS.GPSAltitude', 0],
+            ['GPS.GPSAltitude', -1],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidExifProvider()
+    {
+        return [
+            ['EXIF.UserComment', ''],
+            ['EXIF.UserComment', null],
+            ['EXIF.UserComment', false],
+            ['', 'foo'],
+        ];
+    }
+
+    /**
      * @return array
      */
     public function validResolutionProvider()
@@ -699,6 +808,13 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $this->expectCommandContains($expectedArguments);
 
         $this->raspistill->startTimelapse($filename, $interval, $length);
+    }
+
+    public function testStartTimelapseThrowsExceptionOnEmptyFilename()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->raspistill->startTimelapse('', 5, 30);
     }
 
     /**

@@ -14,6 +14,8 @@ class Raspistill extends Raspicam
 {
     const COMMAND = 'raspistill';
 
+    const EXIF_NONE = 'none';
+
     /**
      * {@inheritdoc}
      */
@@ -142,6 +144,78 @@ class Raspistill extends Raspicam
         $this->assertIntBetween($value, 16, 20000);
 
         $this->valueArguments['height'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Add EXIF tag to apply to pictures.
+     *
+     * Allows the insertion of specific exif tags in to the JPEG image. You can have up to 32 exif tag entries.
+     * This is useful for things like adding GPS metadata. See exif documentation for more details on the range of
+     * tags available.
+     *
+     * Note that a small subset of these tags will be set automatically by the camera system, but will be overridden
+     * by any exif options set by this method.
+     *
+     * @param string $tagName
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function addExif($tagName, $value)
+    {
+        if (empty($tagName)) {
+            throw new \InvalidArgumentException('Tag name required');
+        }
+
+        if ('' === (string) $value) {
+            throw new \InvalidArgumentException('Non-empty value required');
+        }
+
+        if (!isset($this->valueArguments['exif']) || !is_array($this->valueArguments['exif'])) {
+            $this->valueArguments['exif'] = [];
+        }
+
+        if (count($this->valueArguments['exif']) == 32) {
+            throw new \OverflowException('Maximum of 32 EXIF tag entries allowed');
+        }
+
+        $this->valueArguments['exif'][] = $tagName . '=' . (string) $value;
+
+        return $this;
+    }
+
+    /**
+     * Add multiple EXIF tags at once
+     *
+     * @see addExif for more information
+     *
+     * @param array $tags Array key=EXIF tag name, value=tag value
+     *
+     * @return $this
+     */
+    public function setExif(array $tags)
+    {
+        $this->valueArguments['exif'] = [];
+
+        foreach ($tags as $tagName => $value) {
+            $this->addExif($tagName, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Prevent any EXIF information being stored in the file.
+     *
+     * This reduces the file size slightly.
+     *
+     * @return $this
+     */
+    public function disableExif()
+    {
+        $this->valueArguments['exif'] = self::EXIF_NONE;
 
         return $this;
     }
