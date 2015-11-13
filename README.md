@@ -93,6 +93,10 @@ $camera->startTimelapse('image%04d.jpg', 10, 120);
 
 More complex examples can be found in the [examples](examples) directory.
 
+# Documentation
+
+Documentation can be found in the the [docs](docs) directory.
+
 # License
 
 Released under the MIT License (MIT).
