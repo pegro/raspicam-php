@@ -127,7 +127,7 @@ abstract class Raspicam
     /**
      * Flips the image both vertically and horizontally
      *
-     * @param bool $value
+     * @param bool $value Optional. TRUE enables flip, FALSE disables (default=TRUE)
      *
      * @return $this
      */
@@ -142,7 +142,7 @@ abstract class Raspicam
     /**
      * Flips the image vertically
      *
-     * @param bool $value
+     * @param bool $value Optional. TRUE enables flip, FALSE disables (default=TRUE)
      *
      * @return $this
      */
@@ -156,7 +156,7 @@ abstract class Raspicam
     /**
      * Flips the image horizontally
      *
-     * @param bool $value
+     * @param bool $value Optional. TRUE enables flip, FALSE disables (default=TRUE)
      *
      * @return $this
      */
@@ -170,7 +170,7 @@ abstract class Raspicam
     /**
      * Set the sharpness of the image, 0 is the default (-100 to 100)
      *
-     * @param int $value
+     * @param int $value Sharpness
      *
      * @return $this
      */
@@ -186,7 +186,7 @@ abstract class Raspicam
     /**
      * Set the contrast of the image, 0 is the default (-100 to 100)
      *
-     * @param int $value
+     * @param int $value Contrast
      *
      * @return $this
      */
@@ -202,7 +202,7 @@ abstract class Raspicam
     /**
      * Set the brightness of the image, 50 is the default. 0 is black, 100 is white.
      *
-     * @param int $value
+     * @param int $value Brightness
      *
      * @return $this
      */
@@ -218,7 +218,7 @@ abstract class Raspicam
     /**
      * Set the colour saturation of the image. 0 is the default (-100 to 100)
      *
-     * @param int $value
+     * @param int $value Saturation
      *
      * @return $this
      */
@@ -234,7 +234,7 @@ abstract class Raspicam
     /**
      * Sets the ISO to be used for captures. Range is 100 to 800.
      *
-     * @param int $value
+     * @param int $value ISO
      *
      * @return $this
      */
@@ -250,7 +250,7 @@ abstract class Raspicam
     /**
      * Set the exposure (EV) compensation of the image. Range is -10 to +10, default is 0.
      *
-     * @param int $value
+     * @param int $value Exposure compensation
      *
      * @return $this
      */
@@ -267,21 +267,22 @@ abstract class Raspicam
      * Set exposure mode
      *
      * Possible options are:
-     *  - 'auto' Use automatic exposure mode
-     *  - 'night' Select setting for night shooting
-     *  - 'nightpreview'
-     *  - 'backlight' Select setting for back lit subject
-     *  - 'spotlight'
-     *  - 'sports' Select setting for sports (fast shutter etc)
-     *  - 'snow' Select setting optimised for snowy scenery
-     *  - 'beach' Select setting optimised for beach
-     *  - 'verylong' Select setting for long exposures
-     *  - 'fixedfps' Constrain fps to a fixed value
-     *  - 'antishake' Antishake mode
-     *  - 'fireworks' Select settings
+     *  - 'auto' `Raspicam::EXPOSURE_AUTO` Use automatic exposure mode
+     *  - 'night' `Raspicam::EXPOSURE_NIGHT` Select setting for night shooting
+     *  - 'nightpreview' `Raspicam::EXPOSURE_NIGHTPREVIEW`
+     *  - 'backlight' `Raspicam::EXPOSURE_BACKLIGHT` Select setting for back lit subject
+     *  - 'spotlight' `Raspicam::EXPOSURE_SPOTLIGHT`
+     *  - 'sports' `Raspicam::EXPOSURE_SPORTS` Select setting for sports (fast shutter etc)
+     *  - 'snow' `Raspicam::EXPOSURE_SNOW` Select setting optimised for snowy scenery
+     *  - 'beach' `Raspicam::EXPOSURE_BEACH` Select setting optimised for beach
+     *  - 'verylong' `Raspicam::EXPOSURE_VERYLONG` Select setting for long exposures
+     *  - 'fixedfps' `Raspicam::EXPOSURE_FIXEDFPS` Constrain fps to a fixed value
+     *  - 'antishake' `Raspicam::EXPOSURE_ANTISHAKE` Antishake mode
+     *  - 'fireworks' `Raspicam::EXPOSURE_FIREWORKS` Select settings
+     *
      * Note that not all of these settings may be implemented, depending on camera type.
      *
-     * @param string $mode
+     * @param string $mode Exposure mode
      *
      * @return $this
      */
@@ -313,19 +314,20 @@ abstract class Raspicam
      * Set Automatic White Balance (AWB) mode
      *
      * Possible options are:
-     *  - 'off' Turn off white balance calculation
-     *  - 'auto' Automatic mode (default)
-     *  - 'sun' Sunny mode
-     *  - 'cloud' Cloudy mode
-     *  - 'shade' Shaded mode
-     *  - 'tungsten' Tungsten lighting mode
-     *  - 'fluorescent' Fluorescent lighting mode
-     *  - 'incandescent' Incandescent lighting mode
-     *  - 'flash' Flash mode
-     *  - 'horizon' Horizon mode
+     *  - 'off' `Raspicam::WHITE_BALANCE_OFF` Turn off white balance calculation
+     *  - 'auto' `Raspicam::WHITE_BALANCE_AUTO` Automatic mode (default)
+     *  - 'sun' `Raspicam::WHITE_BALANCE_SUN` Sunny mode
+     *  - 'cloud' `Raspicam::WHITE_BALANCE_CLOUD` Cloudy mode
+     *  - 'shade' `Raspicam::WHITE_BALANCE_SHADE` Shaded mode
+     *  - 'tungsten' `Raspicam::WHITE_BALANCE_TUNGSTEN` Tungsten lighting mode
+     *  - 'fluorescent' `Raspicam::WHITE_BALANCE_FLUORESCENT` Fluorescent lighting mode
+     *  - 'incandescent' `Raspicam::WHITE_BALANCE_INCANDESCENT` Incandescent lighting mode
+     *  - 'flash' `Raspicam::WHITE_BALANCE_FLASH` Flash mode
+     *  - 'horizon' `Raspicam::WHITE_BALANCE_HORIZON` Horizon mode
+     *
      * Note that not all of these settings may be implemented, depending on camera type.
      *
-     * @param string $mode
+     * @param string $mode AWB mode
      *
      * @return $this
      */
@@ -355,28 +357,29 @@ abstract class Raspicam
      * Set an effect to be applied to the image
      *
      * Possible options are:
-     * - 'none' NO effect (default)
-     * - 'negative' Negate the image
-     * - 'solarise' Solarise the image
-     * - 'posterise' Posterise the image
-     * - 'whiteboard' Whiteboard effect
-     * - 'blackboard' Blackboard effect
-     * - 'sketch' Sketch style effect
-     * - 'denoise' Denoise the image
-     * - 'emboss' Emboss the image
-     * - 'oilpaint' Apply an oil paint style effect
-     * - 'hatch' Hatch sketch style
-     * - 'gpen'
-     * - 'pastel' A pastel style effect
-     * - 'watercolour' A watercolour style effect
-     * - 'film' Film grain style effect
-     * - 'blur' Blur the image
-     * - 'saturation' Colour saturate the image
-     * - 'colourswap' Not fully implemented
-     * - 'washedout' Not fully implemented
-     * - 'colourpoint' Not fully implemented
-     * - 'colourbalance' Not fully implemented
-     * - 'cartoon' Not fully implemented
+     * - 'none' `Raspicam::EFFECT_NONE` NO effect (default)
+     * - 'negative' `Raspicam::EFFECT_NEGATIVE` Negate the image
+     * - 'solarise' `Raspicam::EFFECT_SOLARISE` Solarise the image
+     * - 'posterise' `Raspicam::EFFECT_POSTERISE` Posterise the image
+     * - 'whiteboard' `Raspicam::EFFECT_WHITEBOARD` Whiteboard effect
+     * - 'blackboard' `Raspicam::EFFECT_BLACKBOARD` Blackboard effect
+     * - 'sketch' `Raspicam::EFFECT_SKETCH` Sketch style effect
+     * - 'denoise' `Raspicam::EFFECT_DENOISE` Denoise the image
+     * - 'emboss' `Raspicam::EFFECT_EMBOSS` Emboss the image
+     * - 'oilpaint' `Raspicam::EFFECT_OILPAINT` Apply an oil paint style effect
+     * - 'hatch' `Raspicam::EFFECT_HATCH` Hatch sketch style
+     * - 'gpen' `Raspicam::EFFECT_GPEN`
+     * - 'pastel' `Raspicam::EFFECT_PASTEL` A pastel style effect
+     * - 'watercolour' `Raspicam::EFFECT_WATERCOLOUR` A watercolour style effect
+     * - 'film' `Raspicam::EFFECT_FILM` Film grain style effect
+     * - 'blur' `Raspicam::EFFECT_BLUR` Blur the image
+     * - 'saturation' `Raspicam::EFFECT_SATURATION` Colour saturate the image
+     * - 'colourswap' `Raspicam::EFFECT_COLOURSWAP` Not fully implemented
+     * - 'washedout' `Raspicam::EFFECT_WASHEDOUT` Not fully implemented
+     * - 'colourpoint' `Raspicam::EFFECT_COLOURPOINT` Not fully implemented
+     * - 'colourbalance' `Raspicam::EFFECT_COLOURBALANCE` Not fully implemented
+     * - 'cartoon' `Raspicam::EFFECT_CARTOON` Not fully implemented
+     *
      * Note that not all of these settings may be available in all circumstances.
      *
      * @param string $mode
@@ -421,10 +424,10 @@ abstract class Raspicam
      * Set metering mode
      *
      * Possible options are:
-     * - 'average' Average the whole frame for metering
-     * - 'spot' Spot metering
-     * - 'backlit' Assume a backlit image
-     * - 'matrix' Matrix metering
+     * - 'average' `Raspicam::METERING_AVERAGE` Average the whole frame for metering
+     * - 'spot' `Raspicam::METERING_SPOT` Spot metering
+     * - 'backlit' `Raspicam::METERING_BACKLIT` Assume a backlit image
+     * - 'matrix' `Raspicam::METERING_MATRIX` Matrix metering
      *
      * @param string $mode
      *
@@ -453,10 +456,10 @@ abstract class Raspicam
      * This can improve the image in low light areas.
      *
      * Possible options are:
-     * - 'off' (default)
-     * - 'low'
-     * - 'medium'
-     * - 'high'
+     * - 'off' `Raspicam::DRC_OFF` (default)
+     * - 'low' `Raspicam::DRC_LOW`
+     * - 'medium' `Raspicam::DRC_MEDIUM`
+     * - 'high' `Raspicam::DRC_HIGH`
      *
      * @param string $mode
      *
@@ -483,7 +486,7 @@ abstract class Raspicam
      *
      * Only 0, 90, 180 and 270 degree rotations are supported.
      *
-     * @param int $degrees
+     * @param int $degrees Degrees
      *
      * @return $this
      */
@@ -507,10 +510,11 @@ abstract class Raspicam
      * Set the shutter speed to the specified time.
      *
      * There is currently an upper limit of approximately 6000000us (6000ms, 6s) past which operation is undefined.
-     * Unit can be one of: Raspicam::TIMEUNIT_SECOND, Raspicam::TIMEUNIT_MILLISECOND, Raspicam::TIMEUNIT_MICROSECOND
+     * Unit can be one of: `Raspicam::TIMEUNIT_MINUTE`, `Raspicam::TIMEUNIT_SECOND`,
+     * `Raspicam::TIMEUNIT_MILLISECOND`, `Raspicam::TIMEUNIT_MICROSECOND`.
      *
-     * @param int    $value
-     * @param string $unit
+     * @param int|float $value Shutter speed
+     * @param string    $unit  Optional. Time unit for $value Default: `Raspicam::TIMEUNIT_SECOND`
      *
      * @return $this
      */
@@ -531,6 +535,7 @@ abstract class Raspicam
      * Sets a specified sensor mode, disabling the automatic selection.
      *
      * Possible values are:
+     *
      * | Mode | Size      | Aspect ratio | Frame rates | FOV     | Binning       |
      * | -----|-----------|--------------|-------------|---------|---------------|
      * | 0    |                  automatic selection                             |
@@ -557,6 +562,8 @@ abstract class Raspicam
 
     /**
      * Mainly used as dependency injection with unit tests
+     *
+     * @internal
      *
      * @param Runner $runner
      *
@@ -607,7 +614,7 @@ abstract class Raspicam
     }
 
     /**
-     * @return string
+     * @return string Output from the last executed CLI command
      */
     public function getOutput()
     {

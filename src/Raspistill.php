@@ -6,7 +6,7 @@ namespace Cvuorinen\Raspicam;
  * Class that abstracts the usage of raspistill cli utility that is used to take photos with the
  * Raspberry Pi camera module.
  *
- * @see https://www.raspberrypi.org/documentation/raspbian/applications/camera.md
+ * @link https://www.raspberrypi.org/documentation/raspbian/applications/camera.md
  *
  * @package Cvuorinen\Raspicam
  */
@@ -15,6 +15,26 @@ class Raspistill extends Raspicam
     const COMMAND = 'raspistill';
 
     const EXIF_NONE = 'none';
+
+    /**
+     * Raspistill constructor.
+     *
+     * **Example:**
+     * ```php
+     * $camera = new Raspistill([
+     *     'rotate' => 90,
+     *     'width' => 640,
+     *     'height' => 480,
+     *     'exposure' => Raspistill::EXPOSURE_NIGHT,
+     * ]);
+     * ```
+     *
+     * @param array $options Associative array where key=method name & value=parameter passed to the method
+     */
+    public function __construct(array $options = [])
+    {
+        parent::__construct($options);
+    }
 
     /**
      * {@inheritdoc}
@@ -29,7 +49,7 @@ class Raspistill extends Raspicam
      *
      * Quality 100 is almost completely uncompressed. 75 is a good all round value
      *
-     * @param int $value
+     * @param int $value Quality
      *
      * @return $this
      */
@@ -47,7 +67,7 @@ class Raspistill extends Raspicam
      *
      * This option inserts the raw Bayer data from the camera in to the JPEG metadata
      *
-     * @param bool $value
+     * @param bool $value Optional. TRUE enables raw, FALSE disables (default=TRUE)
      *
      * @return $this
      */
@@ -62,10 +82,12 @@ class Raspistill extends Raspicam
      * Time before takes picture, default is 5 seconds
      *
      * The camera will run for this length of time, then take the picture.
-     * Unit can be one of: Raspicam::TIMEUNIT_SECOND, Raspicam::TIMEUNIT_MILLISECOND, Raspicam::TIMEUNIT_MICROSECOND
+     * Unit can be one of: `Raspicam::TIMEUNIT_MINUTE`, `Raspicam::TIMEUNIT_SECOND`,
+     * `Raspicam::TIMEUNIT_MILLISECOND`, `Raspicam::TIMEUNIT_MICROSECOND`.
      *
-     * @param int|float $value
-     * @param string    $unit
+     * @param int|float $value Timeout
+     * @param string    $unit  Optional. Time unit for $value Default: `Raspicam::TIMEUNIT_SECOND`
+     *
      *
      * @return $this
      */
@@ -89,12 +111,12 @@ class Raspistill extends Raspicam
      * accelerated. Also note that the filename suffix is completely ignored when deciding the encoding of a file.
      *
      * Possible options are:
-     * - 'jpg' (default)
-     * - 'bmp'
-     * - 'gif'
-     * - 'png'
+     * - 'jpg' `Raspicam::ENCODING_JPG` (default)
+     * - 'bmp' `Raspicam::ENCODING_BMP`
+     * - 'gif' `Raspicam::ENCODING_GIF`
+     * - 'png' `Raspicam::ENCODING_PNG`
      *
-     * @param string $mode
+     * @param string $mode Encoding mode
      *
      * @return $this
      */
@@ -117,7 +139,7 @@ class Raspistill extends Raspicam
     /**
      * Set image width in pixels
      *
-     * @param int $value
+     * @param int $value Width
      *
      * @return $this
      */
@@ -134,7 +156,7 @@ class Raspistill extends Raspicam
     /**
      * Set image height in pixels
      *
-     * @param int $value
+     * @param int $value Height
      *
      * @return $this
      */
@@ -158,8 +180,8 @@ class Raspistill extends Raspicam
      * Note that a small subset of these tags will be set automatically by the camera system, but will be overridden
      * by any exif options set by this method.
      *
-     * @param string $tagName
-     * @param mixed  $value
+     * @param string $tagName EXIF tag name
+     * @param mixed  $value   Tag value
      *
      * @return $this
      */
@@ -189,9 +211,18 @@ class Raspistill extends Raspicam
     /**
      * Add multiple EXIF tags at once
      *
-     * @see addExif for more information
+     * **Example:**
+     * ```php
+     * $camera->setExif([
+     *     'IFD0.Artist' => 'Boris',
+     *     'GPS.GPSAltitude' => '1235/10',
+     *     'EXIF.MakerNote' => 'Testing',
+     * ]);
+     * ```
      *
-     * @param array $tags Array key=EXIF tag name, value=tag value
+     * @see Raspistill::addExif
+     *
+     * @param array $tags Associative array where key=EXIF tag name & value=tag value
      *
      * @return $this
      */
@@ -221,9 +252,9 @@ class Raspistill extends Raspicam
     }
 
     /**
-     * Link latest frame to filename.
+     * Link latest picture to filename.
      *
-     * Make a file system link under this name to the latest frame.
+     * Make a file system link under this name to the latest picture.
      *
      * @param string $filename
      *
@@ -242,6 +273,12 @@ class Raspistill extends Raspicam
 
     /**
      * Take a picture and save with the given filename
+     *
+     * **Example:**
+     * ```php
+     * // Take picture with default configurations
+     * $camera->takePicture('pic1.jpg');
+     * ```
      *
      * @param string $filename
      */
@@ -270,10 +307,19 @@ class Raspistill extends Raspicam
      * If a timelapse value of 0 is entered, the application will take pictures as fast as possible. Note there is an
      * minimum enforced pause of 30ms between captures to ensure that exposure calculations can be made.
      *
+     * Time unit can be one of: `Raspicam::TIMEUNIT_MINUTE`, `Raspicam::TIMEUNIT_SECOND`,
+     * `Raspicam::TIMEUNIT_MILLISECOND`, `Raspicam::TIMEUNIT_MICROSECOND`.
+     *
+     * **Example:**
+     * ```php
+     * // take picture every ten seconds for two minutes
+     * $camera->startTimelapse('image%04d.jpg', 10, 120);
+     * ```
+     *
      * @param string    $filename
      * @param int|float $interval Time between shots.
      * @param int|float $length   Time how long to keep taking pictures.
-     * @param string    $timeUnit
+     * @param string    $timeUnit Optional. Time unit for $interval and $length. Default: `Raspicam::TIMEUNIT_SECOND`
      */
     public function startTimelapse($filename, $interval, $length, $timeUnit = self::TIMEUNIT_SECOND)
     {
