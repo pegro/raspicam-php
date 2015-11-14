@@ -2,44 +2,40 @@
 
 namespace Cvuorinen\Raspicam\Test;
 
-use AdamBrett\ShellWrapper\Command\CommandInterface;
-use AdamBrett\ShellWrapper\ExitCodes;
-use AdamBrett\ShellWrapper\Runners\Exec;
-use Cvuorinen\Raspicam\CommandFailedException;
 use Cvuorinen\Raspicam\Raspicam;
 use Cvuorinen\Raspicam\Raspistill;
-use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_TestCase;
 
-class RaspistillTest extends PHPUnit_Framework_TestCase
+class RaspistillTest extends RaspicamTest
 {
     /**
      * @var Raspistill
      */
-    private $raspistill;
-
-    /**
-     * @var PHPUnit_Framework_MockObject_MockObject
-     */
-    private $commandRunner;
-
+    protected $camera;
 
     public function setUp()
     {
         $this->commandRunner = $this->getMock('AdamBrett\ShellWrapper\Runners\Exec');
 
-        $this->raspistill = new Raspistill();
+        $this->camera = new Raspistill();
 
-        $this->raspistill->setCommandRunner(
+        $this->camera->setCommandRunner(
             $this->commandRunner
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute($filename = 'foo')
+    {
+        $this->camera->takePicture($filename);
     }
 
     public function testTakePictureThrowsExceptionOnEmptyFilename()
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->raspistill->takePicture('');
+        $this->camera->takePicture('');
     }
 
     public function testTakePictureExecutesCommand()
@@ -48,22 +44,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('run');
 
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    public function testGetOutputReturnCommandOutput()
-    {
-        $this->commandRunner
-            ->expects($this->once())
-            ->method('getOutput')
-            ->willReturn('some-output');
-
-        $this->raspistill->takePicture('foo.jpg');
-
-        $this->assertEquals(
-            'some-output',
-            $this->raspistill->getOutput()
-        );
+        $this->camera->takePicture('foo.jpg');
     }
 
     public function testTakePictureSetsOutputArgument()
@@ -72,216 +53,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
 
         $this->expectCommandContains("--output '" . $filename . "'");
 
-        $this->raspistill->takePicture($filename);
-    }
-
-    public function testFailedCommandThrowsException()
-    {
-        $this->commandRunner
-            ->method('getReturnValue')
-            ->willReturn(ExitCodes::GENERAL_ERROR);
-
-        $this->setExpectedException(
-            'Cvuorinen\Raspicam\CommandFailedException'
-        );
-
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    public function testFailedCommandExceptionMessage()
-    {
-        $this->commandRunner
-            ->method('getReturnValue')
-            ->willReturn(ExitCodes::COMMAND_NOT_FOUND);
-
-        $this->setExpectedException(
-            'Cvuorinen\Raspicam\CommandFailedException',
-            'Command not found'
-        );
-
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    public function testVerticalFlipSetsCorrectArgument()
-    {
-        $this->expectCommandContains('--vflip');
-
-        $this->raspistill->verticalFlip();
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    public function testVerticalFlipArgumentNotSetWhenUnset()
-    {
-        $this->raspistill->verticalFlip();
-        $this->raspistill->takePicture('foo.jpg');
-
-        $this->expectCommandNotContains('--vflip');
-
-        $this->raspistill->verticalFlip(false);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    public function testHorizontalFlipSetsCorrectArgument()
-    {
-        $this->expectCommandContains('--hflip');
-
-        $this->raspistill->horizontalFlip();
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    public function testFlipSetsBothVerticalAndHorizontalArguments()
-    {
-        $this->expectCommandContains(['--vflip', '--hflip']);
-
-        $this->raspistill->flip();
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider validIntegerBetweenNegativeHundredAndHundredProvider
-     */
-    public function testSharpnessSetsCorrectArgument($sharpness)
-    {
-        $this->expectCommandContains("--sharpness '" . $sharpness . "'");
-
-        $this->raspistill->sharpness($sharpness);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidIntegerBetweenNegativeHundredAndHundredProvider
-     */
-    public function testInvalidSharpnessThrowsException($sharpness)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->sharpness($sharpness);
-    }
-
-    /**
-     * @dataProvider validIntegerBetweenNegativeHundredAndHundredProvider
-     */
-    public function testContrastSetsCorrectArgument($contrast)
-    {
-        $this->expectCommandContains("--contrast '" . $contrast . "'");
-
-        $this->raspistill->contrast($contrast);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidIntegerBetweenNegativeHundredAndHundredProvider
-     */
-    public function testInvalidContrastThrowsException($contrast)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->contrast($contrast);
-    }
-
-    /**
-     * @dataProvider validIntegerBetweenZeroAndHundredProvider
-     */
-    public function testBrightnessSetsCorrectArgument($brightness)
-    {
-        $this->expectCommandContains("--brightness '" . $brightness . "'");
-
-        $this->raspistill->brightness($brightness);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidIntegerBetweenZeroAndHundredProvider
-     */
-    public function testInvalidBrightnessThrowsException($brightness)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->brightness($brightness);
-    }
-
-    /**
-     * @dataProvider validIntegerBetweenNegativeHundredAndHundredProvider
-     */
-    public function testSaturationSetsCorrectArgument($saturation)
-    {
-        $this->expectCommandContains("--saturation '" . $saturation . "'");
-
-        $this->raspistill->saturation($saturation);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidIntegerBetweenNegativeHundredAndHundredProvider
-     */
-    public function testInvalidSaturationThrowsException($saturation)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->saturation($saturation);
-    }
-
-    /**
-     * @dataProvider validIntegerBetweenHundredAndEightHundredProvider
-     */
-    public function testISOSetsCorrectArgument($iso)
-    {
-        $this->expectCommandContains("--ISO '" . $iso . "'");
-
-        $this->raspistill->ISO($iso);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidIntegerBetweenHundredAndEightHundredProvider
-     */
-    public function testInvalidISOThrowsException($iso)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->ISO($iso);
-    }
-
-    /**
-     * @dataProvider validIntegerBetweenNegativeTenAndTenProvider
-     */
-    public function testExposureCompensationSetsCorrectArgument($ev)
-    {
-        $this->expectCommandContains("--ev '" . $ev . "'");
-
-        $this->raspistill->exposureCompensation($ev);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidIntegerBetweenNegativeTenAndTenProvider
-     */
-    public function testInvalidExposureCompensationThrowsException($ev)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->exposureCompensation($ev);
-    }
-
-    /**
-     * @dataProvider validExposureProvider
-     */
-    public function testExposureSetsCorrectArgument($exposure)
-    {
-        $this->expectCommandContains("--exposure '" . $exposure . "'");
-
-        $this->raspistill->exposure($exposure);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidStringProvider
-     */
-    public function testInvalidExposureThrowsException($exposure)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->exposure($exposure);
+        $this->camera->takePicture($filename);
     }
 
     /**
@@ -291,8 +63,8 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $this->expectCommandContains("--quality '" . $quality . "'");
 
-        $this->raspistill->quality($quality);
-        $this->raspistill->takePicture('foo.jpg');
+        $this->camera->quality($quality);
+        $this->execute();
     }
 
     /**
@@ -302,15 +74,15 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->raspistill->quality($quality);
+        $this->camera->quality($quality);
     }
 
     public function testRawSetsCorrectArgument()
     {
         $this->expectCommandContains('--raw');
 
-        $this->raspistill->raw();
-        $this->raspistill->takePicture('foo.jpg');
+        $this->camera->raw();
+        $this->execute();
     }
 
     /**
@@ -320,15 +92,15 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $this->expectCommandContains("--timeout '" . $expected . "'");
 
-        $this->raspistill->timeout($value, $unit);
-        $this->raspistill->takePicture('foo.jpg');
+        $this->camera->timeout($value, $unit);
+        $this->execute();
     }
 
     public function testInvalidTimeoutThrowsException()
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->raspistill->timeout(-2);
+        $this->camera->timeout(-2);
     }
 
     /**
@@ -345,98 +117,27 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider validWhiteBalanceProvider
-     */
-    public function testWhiteBalanceSetsCorrectArgument($whiteBalance)
-    {
-        $this->expectCommandContains("--awb '" . $whiteBalance . "'");
-
-        $this->raspistill->whiteBalance($whiteBalance);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidStringProvider
-     */
-    public function testInvalidWhiteBalanceThrowsException($whiteBalance)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->whiteBalance($whiteBalance);
-    }
-
-    /**
-     * @dataProvider validEffectProvider
-     */
-    public function testEffectSetsCorrectArgument($effect)
-    {
-        $this->expectCommandContains("--imxfx '" . $effect . "'");
-
-        $this->raspistill->effect($effect);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidStringProvider
-     */
-    public function testInvalidEffectThrowsException($effect)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->effect($effect);
-    }
-
-    /**
-     * @dataProvider validMeteringProvider
-     */
-    public function testMeteringSetsCorrectArgument($metering)
-    {
-        $this->expectCommandContains("--metering '" . $metering . "'");
-
-        $this->raspistill->metering($metering);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidStringProvider
-     */
-    public function testInvalidMeteringThrowsException($metering)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->metering($metering);
-    }
-
-    /**
-     * @dataProvider validDrcProvider
-     */
-    public function testDynamicRangeCompressionSetsCorrectArgument($drc)
-    {
-        $this->expectCommandContains("--drc '" . $drc . "'");
-
-        $this->raspistill->dynamicRangeCompression($drc);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidStringProvider
-     */
-    public function testInvalidDynamicRangeCompressionThrowsException($drc)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->dynamicRangeCompression($drc);
-    }
-
-    /**
      * @dataProvider validEncodingProvider
      */
     public function testEncodingSetsCorrectArgument($encoding)
     {
         $this->expectCommandContains("--encoding '" . $encoding . "'");
 
-        $this->raspistill->encoding($encoding);
-        $this->raspistill->takePicture('foo.jpg');
+        $this->camera->encoding($encoding);
+        $this->execute();
+    }
+
+    /**
+     * @return array
+     */
+    public function validEncodingProvider()
+    {
+        return [
+            [Raspistill::ENCODING_JPG],
+            [Raspistill::ENCODING_BMP],
+            [Raspistill::ENCODING_GIF],
+            [Raspistill::ENCODING_PNG],
+        ];
     }
 
     /**
@@ -446,56 +147,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->raspistill->encoding($encoding);
-    }
-
-    /**
-     * @dataProvider validRotateProvider
-     */
-    public function testRotateSetsCorrectArgument($rotate)
-    {
-        $this->expectCommandContains("--rotation '" . $rotate . "'");
-
-        $this->raspistill->rotate($rotate);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidRotateProvider
-     */
-    public function testInvalidRotateThrowsException($rotate)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->rotate($rotate);
-    }
-
-    /**
-     * @dataProvider shutterSpeedProvider
-     */
-    public function testShutterSpeedSetsCorrectArgument($value, $unit, $expected)
-    {
-        $this->expectCommandContains("--shutter '" . $expected . "'");
-
-        $this->raspistill->shutterSpeed($value, $unit);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidPositiveNumberProvider
-     */
-    public function testInvalidShutterSpeedThrowsException($shutter)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->shutterSpeed($shutter);
-    }
-
-    public function testInvalidTimeUnitThrowsException()
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->shutterSpeed(1, 'foo');
+        $this->camera->encoding($encoding);
     }
 
     /**
@@ -505,8 +157,8 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $this->expectCommandContains("--width '" . $width . "'");
 
-        $this->raspistill->width($width);
-        $this->raspistill->takePicture('foo.jpg');
+        $this->camera->width($width);
+        $this->execute();
     }
 
     /**
@@ -516,7 +168,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->raspistill->width($width);
+        $this->camera->width($width);
     }
 
     /**
@@ -526,8 +178,8 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $this->expectCommandContains("--height '" . $height . "'");
 
-        $this->raspistill->height($height);
-        $this->raspistill->takePicture('foo.jpg');
+        $this->camera->height($height);
+        $this->execute();
     }
 
     /**
@@ -537,166 +189,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->raspistill->height($height);
-    }
-
-    /**
-     * @dataProvider validSensorModeProvider
-     */
-    public function testSensorModeSetsCorrectArgument($mode)
-    {
-        $this->expectCommandContains("--mode '" . $mode . "'");
-
-        $this->raspistill->sensorMode($mode);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidSensorModeProvider
-     */
-    public function testInvalidSensorModeThrowsException($mode)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->sensorMode($mode);
-    }
-
-    /**
-     * @return array
-     */
-    public function validSensorModeProvider()
-    {
-        return [
-            [0],
-            [1],
-            [5],
-            [7],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidSensorModeProvider()
-    {
-        return [
-            [-1],
-            [15],
-            [1.5],
-            [-12.0],
-            [false],
-            [null],
-            ['foo'],
-        ];
-    }
-
-    /**
-     * @dataProvider validExifProvider
-     */
-    public function testAddExifSetsCorrectArgument($tagName, $value)
-    {
-        $this->expectCommandContains("--exif '" . $tagName . "=" . $value . "'");
-
-        $this->raspistill->addExif($tagName, $value);
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @dataProvider invalidExifProvider
-     */
-    public function testInvalidAddExifThrowsException($tagName, $value)
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $this->raspistill->addExif($tagName, $value);
-    }
-
-    public function testAddExifThrowsExceptionWhenTooManyTags()
-    {
-        $this->setExpectedException('OverflowException');
-
-        for ($i = 0; $i < 33; $i++) {
-            $this->raspistill->addExif('EXIF.MakerNote' . $i, 'Testing');
-        }
-    }
-
-    public function testAddExifSetsMultipleArguments()
-    {
-        $tags = [
-            'IFD0.Artist' => 'Boris',
-            'GPS.GPSAltitude' => '1235/10',
-            'EXIF.MakerNote' => 'Testing',
-        ];
-
-        $expectedArgs = [];
-
-        foreach ($tags as $tagName => $value) {
-            $expectedArgs[] = "--exif '" . $tagName . "=" . $value . "'";
-
-            $this->raspistill->addExif($tagName, $value);
-        }
-
-        $this->expectCommandContains($expectedArgs);
-
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    public function testSetExifSetsMultipleArguments()
-    {
-        $tags = [
-            'IFD0.Artist' => 'Boris',
-            'GPS.GPSAltitude' => '1235/10',
-            'EXIF.MakerNote' => 'Testing',
-        ];
-
-        $expectedArgs = [];
-
-        foreach ($tags as $tagName => $value) {
-            $expectedArgs[] = "--exif '" . $tagName . "=" . $value . "'";
-        }
-
-        $this->raspistill->setExif($tags);
-
-        $this->expectCommandContains($expectedArgs);
-
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    public function testDisableExifSetsCorrectArgument()
-    {
-        $this->expectCommandContains("--exif 'none'");
-
-        $this->raspistill->disableExif();
-        $this->raspistill->takePicture('foo.jpg');
-    }
-
-    /**
-     * @return array
-     */
-    public function validExifProvider()
-    {
-        return [
-            ['EXIF.UserComment', 'testing'],
-            ['EXIF.ExposureTime', 500],
-            ['IDF0.Artist', 'Boris'],
-            ['GPS.GPSAltitude', '1235/10'],
-            ['GPS.GPSAltitude', '0'],
-            ['GPS.GPSAltitude', 0],
-            ['GPS.GPSAltitude', -1],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidExifProvider()
-    {
-        return [
-            ['EXIF.UserComment', ''],
-            ['EXIF.UserComment', null],
-            ['EXIF.UserComment', false],
-            ['', 'foo'],
-        ];
+        $this->camera->height($height);
     }
 
     /**
@@ -731,6 +224,115 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             [null],
             ['foo'],
         ];
+    }
+
+    /**
+     * @dataProvider validExifProvider
+     */
+    public function testAddExifSetsCorrectArgument($tagName, $value)
+    {
+        $this->expectCommandContains("--exif '" . $tagName . "=" . $value . "'");
+
+        $this->camera->addExif($tagName, $value);
+        $this->execute();
+    }
+
+    /**
+     * @return array
+     */
+    public function validExifProvider()
+    {
+        return [
+            ['EXIF.UserComment', 'testing'],
+            ['EXIF.ExposureTime', 500],
+            ['IDF0.Artist', 'Boris'],
+            ['GPS.GPSAltitude', '1235/10'],
+            ['GPS.GPSAltitude', '0'],
+            ['GPS.GPSAltitude', 0],
+            ['GPS.GPSAltitude', -1],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidExifProvider
+     */
+    public function testInvalidAddExifThrowsException($tagName, $value)
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->camera->addExif($tagName, $value);
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidExifProvider()
+    {
+        return [
+            ['EXIF.UserComment', ''],
+            ['EXIF.UserComment', null],
+            ['EXIF.UserComment', false],
+            ['', 'foo'],
+        ];
+    }
+
+    public function testAddExifThrowsExceptionWhenTooManyTags()
+    {
+        $this->setExpectedException('OverflowException');
+
+        for ($i = 0; $i < 33; $i++) {
+            $this->camera->addExif('EXIF.MakerNote' . $i, 'Testing');
+        }
+    }
+
+    public function testAddExifSetsMultipleArguments()
+    {
+        $tags = [
+            'IFD0.Artist' => 'Boris',
+            'GPS.GPSAltitude' => '1235/10',
+            'EXIF.MakerNote' => 'Testing',
+        ];
+
+        $expectedArgs = [];
+
+        foreach ($tags as $tagName => $value) {
+            $expectedArgs[] = "--exif '" . $tagName . "=" . $value . "'";
+
+            $this->camera->addExif($tagName, $value);
+        }
+
+        $this->expectCommandContains($expectedArgs);
+
+        $this->execute();
+    }
+
+    public function testSetExifSetsMultipleArguments()
+    {
+        $tags = [
+            'IFD0.Artist' => 'Boris',
+            'GPS.GPSAltitude' => '1235/10',
+            'EXIF.MakerNote' => 'Testing',
+        ];
+
+        $expectedArgs = [];
+
+        foreach ($tags as $tagName => $value) {
+            $expectedArgs[] = "--exif '" . $tagName . "=" . $value . "'";
+        }
+
+        $this->camera->setExif($tags);
+
+        $this->expectCommandContains($expectedArgs);
+
+        $this->execute();
+    }
+
+    public function testDisableExifSetsCorrectArgument()
+    {
+        $this->expectCommandContains("--exif 'none'");
+
+        $this->camera->disableExif();
+        $this->execute();
     }
 
     public function testConstructorArraySetsCorrectArguments()
@@ -776,7 +378,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
 
         $this->expectCommandContains($expectedArguments);
 
-        $this->raspistill->flip()
+        $this->camera->flip()
             ->contrast(50)
             ->ISO(500)
             ->exposure(Raspistill::EXPOSURE_NIGHT)
@@ -790,7 +392,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('run');
 
-        $this->raspistill->startTimelapse('foo%04d.jpg', 5, 60);
+        $this->camera->startTimelapse('foo%04d.jpg', 5, 60);
     }
 
     public function testStartTimelapseSetsCorrectArguments()
@@ -807,7 +409,7 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
 
         $this->expectCommandContains($expectedArguments);
 
-        $this->raspistill->startTimelapse($filename, $interval, $length);
+        $this->camera->startTimelapse($filename, $interval, $length);
     }
 
     public function testStartTimelapseConvertsTimeUnits()
@@ -825,14 +427,14 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
 
         $this->expectCommandContains($expectedArguments);
 
-        $this->raspistill->startTimelapse($filename, $interval, $length, $unit);
+        $this->camera->startTimelapse($filename, $interval, $length, $unit);
     }
 
     public function testStartTimelapseThrowsExceptionOnEmptyFilename()
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->raspistill->startTimelapse('', 5, 30);
+        $this->camera->startTimelapse('', 5, 30);
     }
 
     public function testLinkLatestSetsCorrectArgument()
@@ -840,372 +442,14 @@ class RaspistillTest extends PHPUnit_Framework_TestCase
         $filename = 'latest.jpg';
         $this->expectCommandContains("--latest '" . $filename . "'");
 
-        $this->raspistill->linkLatest($filename);
-        $this->raspistill->takePicture('foo.jpg');
+        $this->camera->linkLatest($filename);
+        $this->execute();
     }
 
     public function testLinkLatestThrowsExceptionOnEmptyFilename()
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->raspistill->linkLatest('');
-    }
-
-    /**
-     * @return array
-     */
-    public function validIntegerBetweenNegativeHundredAndHundredProvider()
-    {
-        return [
-            [1],
-            [99],
-            [100],
-            [0],
-            [-1],
-            [-99],
-            [-100]
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidIntegerBetweenNegativeHundredAndHundredProvider()
-    {
-        return [
-            [999],
-            [101],
-            [-999],
-            [-101],
-            [5.5],
-            [-12.0],
-            [false],
-            [null],
-            ['foo']
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validIntegerBetweenZeroAndHundredProvider()
-    {
-        return [
-            [1],
-            [99],
-            [100],
-            [0],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidIntegerBetweenZeroAndHundredProvider()
-    {
-        return [
-            [999],
-            [101],
-            [-1],
-            [-101],
-            [5.5],
-            [-12.0],
-            [false],
-            [null],
-            ['foo']
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validIntegerBetweenHundredAndEightHundredProvider()
-    {
-        return [
-            [100],
-            [101],
-            [567],
-            [800]
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidIntegerBetweenHundredAndEightHundredProvider()
-    {
-        return [
-            [801],
-            [999],
-            [99],
-            [1],
-            [0],
-            [-1],
-            [-101],
-            [5.5],
-            [-12.0],
-            [false],
-            [null],
-            ['foo']
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validIntegerBetweenNegativeTenAndTenProvider()
-    {
-        return [
-            [1],
-            [9],
-            [10],
-            [0],
-            [-1],
-            [-9],
-            [-10]
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidIntegerBetweenNegativeTenAndTenProvider()
-    {
-        return [
-            [99],
-            [11],
-            [-99],
-            [-11],
-            [5.5],
-            [-2.0],
-            [false],
-            [null],
-            ['foo']
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function shutterSpeedProvider()
-    {
-        return [
-            ['value' => 2, 'unit' => Raspicam::TIMEUNIT_SECOND, 'expected' => 2000000],
-            ['value' => 1.54, 'unit' => Raspicam::TIMEUNIT_SECOND, 'expected' => 1540000],
-            ['value' => 4000, 'unit' => Raspicam::TIMEUNIT_MILLISECOND, 'expected' => 4000000],
-            ['value' => 5000000, 'unit' => Raspicam::TIMEUNIT_MICROSECOND, 'expected' => 5000000],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidPositiveNumberProvider()
-    {
-        return [
-            [0],
-            [-99],
-            [-11],
-            [-2.0],
-            [false],
-            [null],
-            ['foo']
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validExposureProvider()
-    {
-        return [
-            [Raspistill::EXPOSURE_AUTO],
-            [Raspistill::EXPOSURE_NIGHT],
-            [Raspistill::EXPOSURE_NIGHTPREVIEW],
-            [Raspistill::EXPOSURE_BACKLIGHT],
-            [Raspistill::EXPOSURE_SPOTLIGHT],
-            [Raspistill::EXPOSURE_SPORTS],
-            [Raspistill::EXPOSURE_SNOW],
-            [Raspistill::EXPOSURE_BEACH],
-            [Raspistill::EXPOSURE_VERYLONG],
-            [Raspistill::EXPOSURE_FIXEDFPS],
-            [Raspistill::EXPOSURE_ANTISHAKE],
-            [Raspistill::EXPOSURE_FIREWORKS],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validWhiteBalanceProvider()
-    {
-        return [
-            [Raspistill::WHITE_BALANCE_OFF],
-            [Raspistill::WHITE_BALANCE_AUTO],
-            [Raspistill::WHITE_BALANCE_SUN],
-            [Raspistill::WHITE_BALANCE_CLOUD],
-            [Raspistill::WHITE_BALANCE_SHADE],
-            [Raspistill::WHITE_BALANCE_TUNGSTEN],
-            [Raspistill::WHITE_BALANCE_FLUORESCENT],
-            [Raspistill::WHITE_BALANCE_INCANDESCENT],
-            [Raspistill::WHITE_BALANCE_FLASH],
-            [Raspistill::WHITE_BALANCE_HORIZON],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validEffectProvider()
-    {
-        return [
-            [Raspistill::EFFECT_NONE],
-            [Raspistill::EFFECT_NEGATIVE],
-            [Raspistill::EFFECT_SOLARISE],
-            [Raspistill::EFFECT_POSTERISE],
-            [Raspistill::EFFECT_WHITEBOARD],
-            [Raspistill::EFFECT_BLACKBOARD],
-            [Raspistill::EFFECT_SKETCH],
-            [Raspistill::EFFECT_DENOISE],
-            [Raspistill::EFFECT_EMBOSS],
-            [Raspistill::EFFECT_OILPAINT],
-            [Raspistill::EFFECT_HATCH],
-            [Raspistill::EFFECT_GPEN],
-            [Raspistill::EFFECT_PASTEL],
-            [Raspistill::EFFECT_WATERCOLOUR],
-            [Raspistill::EFFECT_FILM],
-            [Raspistill::EFFECT_BLUR],
-            [Raspistill::EFFECT_SATURATION],
-            [Raspistill::EFFECT_COLOURSWAP],
-            [Raspistill::EFFECT_WASHEDOUT],
-            [Raspistill::EFFECT_COLOURPOINT],
-            [Raspistill::EFFECT_COLOURBALANCE],
-            [Raspistill::EFFECT_CARTOON],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validMeteringProvider()
-    {
-        return [
-            [Raspistill::METERING_AVERAGE],
-            [Raspistill::METERING_SPOT],
-            [Raspistill::METERING_BACKLIT],
-            [Raspistill::METERING_MATRIX],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validDrcProvider()
-    {
-        return [
-            [Raspistill::DRC_OFF],
-            [Raspistill::DRC_LOW],
-            [Raspistill::DRC_MEDIUM],
-            [Raspistill::DRC_HIGH],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validEncodingProvider()
-    {
-        return [
-            [Raspistill::ENCODING_JPG],
-            [Raspistill::ENCODING_BMP],
-            [Raspistill::ENCODING_GIF],
-            [Raspistill::ENCODING_PNG],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidStringProvider()
-    {
-        return [
-            ['foo'],
-            ['%¤"*-@'],
-            [1],
-            [0],
-            [-11],
-            [5.5],
-            [-2.0],
-            [false],
-            [null],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function validRotateProvider()
-    {
-        return [
-            [0],
-            [90],
-            [180],
-            [270],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidRotateProvider()
-    {
-        return [
-            ['foo'],
-            ['%¤"*-@'],
-            ['90'],
-            [1],
-            [10],
-            [-11],
-            [5.5],
-            [-2.0],
-            [false],
-            [null],
-        ];
-    }
-
-    /**
-     * @param string|array $strings
-     */
-    private function expectCommandContains($strings)
-    {
-        if (!is_array($strings)) {
-            $strings = [$strings];
-        }
-
-        $this->commandRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with($this->callback(function (CommandInterface $command) use ($strings) {
-                foreach ($strings as $string) {
-                    $this->assertContains($string, $command->__toString());
-                }
-
-                return true;
-            }));
-    }
-
-    /**
-     * @param string $string
-     */
-    private function expectCommandNotContains($string)
-    {
-        $this->commandRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with($this->callback(function (CommandInterface $command) use ($string) {
-                $this->assertNotContains($string, $command->__toString());
-
-                return true;
-            }));
+        $this->camera->linkLatest('');
     }
 }
