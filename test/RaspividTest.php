@@ -40,14 +40,9 @@ class RaspividTest extends RaspicamTest
 
     public function testRecordVideoExecutesCommand()
     {
-        $this->commandRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with($this->callback(function (CommandInterface $command) {
-                return 0 === strpos((string) $command, Raspivid::COMMAND);
-            }));
+        $this->expectCommandContains(Raspivid::COMMAND);
 
-        $this->camera->recordVideo('foo.h264', 5);
+        $this->execute();
     }
 
     public function testRecordVideoSetsOutputAndTimeoutArguments()

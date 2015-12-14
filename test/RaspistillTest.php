@@ -40,11 +40,9 @@ class RaspistillTest extends RaspicamTest
 
     public function testTakePictureExecutesCommand()
     {
-        $this->commandRunner
-            ->expects($this->once())
-            ->method('run');
+        $this->expectCommandContains(Raspistill::COMMAND);
 
-        $this->camera->takePicture('foo.jpg');
+        $this->execute();
     }
 
     public function testTakePictureSetsOutputArgument()
