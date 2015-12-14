@@ -14,7 +14,7 @@
     "require": {
         "php" : ">=5.4.0",
         "adambrett/shell-wrapper": "~0.5",
-        "cvuorinen/phpdoc-md": "^0.1.2"
+        "cvuorinen/phpdoc-markdown-public": "^0.1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8"
@@ -31,6 +31,6 @@
     },
     "scripts": {
         "test": "phpunit",
-        "docs": "phpdoc -d ./src -i '*Exception.php' -t ./build --template='xml' && phpdocmd ./build/structure.xml ./docs --title 'Raspicam PHP Documentation'"
+        "docs": "phpdoc"
     }
 }
