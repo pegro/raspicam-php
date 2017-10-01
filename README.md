@@ -21,6 +21,7 @@ Then install [composer](https://getcomposer.org/doc/00-intro.md#installation-lin
 
 ```bash
 curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
 ```
 
 # Install
@@ -96,6 +97,25 @@ More complex examples can be found in the [examples](examples) directory.
 # Documentation
 
 Documentation can be found in the the [docs](docs) directory.
+
+# Troubleshooting
+
+Since Raspicam PHP is just a wrapper around `raspistill`, you should first make sure that it works
+without issues. This can be done by calling it directly, for example creating a PHP script with just
+`passthru("raspistill -o /tmp/test.jpg");` and calling it the same way as the script that uses 
+Raspicam PHP.
+
+Depending on how you are going to execute your PHP code, you might have to adjust some permissions.
+The executing user needs access to `/dev/vchiq` on the Pi. If you are executing from command-line 
+as the default user, it should just work.
+
+If you are executing through a web server like Apache, you need to adjust the permissions so that the 
+web server user (`www-data` in case of Apache) has permission to access it by adding the user to the 
+group `video` (with e.g. `sudo usermod -a -G video www-data`).
+
+Also make sure that the user has permission to write to the file/directory where you are saving the
+images. The filename is relative to PHP [current working directory](http://php.net/manual/en/function.getcwd.php),
+but absolute paths can also be used.
 
 # License
 
