@@ -171,6 +171,23 @@ class Raspistill extends Raspicam
     }
 
     /**
+     * Set starting frame number in output pattern(%d)
+     *
+     * @param int $value starting frame number
+     *
+     * @return $this
+     */
+    public function framestart($value)
+    {
+        // Documentation doesn't mention min/max values, so these are based on my own testing
+        $this->assertIntBetween($value, 0, 99999);
+
+        $this->valueArguments['framestart'] = $value;
+
+        return $this;
+    }
+
+    /**
      * Add EXIF tag to apply to pictures.
      *
      * Allows the insertion of specific exif tags in to the JPEG image. You can have up to 32 exif tag entries.
