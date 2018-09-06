@@ -2,12 +2,7 @@
 
 namespace Cvuorinen\Raspicam;
 
-use AdamBrett\ShellWrapper\Command\Builder as CommandBuilder;
-use AdamBrett\ShellWrapper\Command\CommandInterface;
-use AdamBrett\ShellWrapper\ExitCodes;
-use AdamBrett\ShellWrapper\Runners\Exec;
-use AdamBrett\ShellWrapper\Runners\ReturnValue;
-use AdamBrett\ShellWrapper\Runners\Runner;
+use Symfony\Component\Process\Process;
 
 /**
  * Abstracts some common functionality related to al of the camera commands
@@ -84,9 +79,9 @@ abstract class Raspicam
     const TIMEUNIT_MICROSECOND = 'us';
 
     /**
-     * @var Runner
+     * @var Process
      */
-    protected $commandRunner;
+    protected $process;
 
     /**
      * @var string
@@ -561,112 +556,74 @@ abstract class Raspicam
     }
 
     /**
-     * Mainly used as dependency injection with unit tests
-     *
-     * @internal
-     *
-     * @param Runner $runner
-     *
-     * @return $this
-     */
-    public function setCommandRunner(Runner $runner)
-    {
-        $this->commandRunner = $runner;
-
-        return $this;
-    }
-
-    /**
-     * @param CommandInterface $command
-     *
      * @throws CommandFailedException
      */
-    protected function execute(CommandInterface $command)
+    public function start()
     {
-        $runner = $this->getCommandRunner();
-
-        $this->lastReturnValue = $runner->run($command);
-
-        $this->checkReturnValue($runner);
-    }
-
-    /**
-     * @param Runner $runner
-     *
-     * @return bool
-     * @throws CommandFailedException
-     */
-    private function checkReturnValue(Runner $runner)
-    {
-        if (!($runner instanceof ReturnValue)) {
-            return true;
+        if($this->process && $this->process->isRunning()) {
+            throw new CommandFailedException('Process already in progress');
         }
 
-        $exitCode = $runner->getReturnValue();
-
-        if (ExitCodes::SUCCESS == $exitCode) {
-            return true;
-        }
-
-        throw new CommandFailedException(
-            ExitCodes::getDescription($exitCode)
-        );
-    }
-
-    /**
-     * @return string Output from the last executed CLI command
-     */
-    public function getOutput()
-    {
-        $runner = $this->getCommandRunner();
-
-        if ($runner instanceof Exec) {
-            return $runner->getOutput();
-        }
-
-        return $this->lastReturnValue;
-    }
-
-    /**
-     * @return Runner
-     */
-    protected function getCommandRunner()
-    {
-        if (null === $this->commandRunner) {
-            $this->commandRunner = new Exec();
-        }
-
-        return $this->commandRunner;
-    }
-
-    /**
-     * @return CommandInterface
-     */
-    protected function buildCommand()
-    {
-        $command = $this->getCommandBuilder();
+        $command = [$this->getExecutable()];
 
         foreach ($this->booleanArguments as $name => $value) {
             if ($value) {
-                $command->addArgument($name);
+                $command[] = '--' . $name;
             }
         }
 
         foreach ($this->valueArguments as $name => $value) {
-            $command->addArgument($name, $value);
+            $command[] = '--' . $name;
+            $command[] = $value;
         }
 
-        return $command;
+        $this->process = new Process($command);
+
+        try {
+            $this->process->start();
+
+            return $this->process->isRunning();
+        } catch (ProcessFailedException $exception) {
+            throw new CommandFailedException($exception->getMessage(), $exception->getCode());
+        }
     }
 
     /**
-     * @return CommandBuilder
+     * @return bool
      */
-    protected function getCommandBuilder()
+    public function isRunning()
     {
-        return new CommandBuilder(
-            $this->getExecutable()
-        );
+        return $this->process != null ? $this->process->isRunning() : false;
+    }
+
+    /**
+     *
+     */
+    public function stop()
+    {
+        if($this->process && $this->process->isRunning()) {
+            $this->process->stop();
+        }
+
+        // HACK: make sure raspistill is dead
+        $retries = 5;
+        while($retries) {
+            sleep(1);
+            $pid = exec('pidof raspistill');
+
+            // it's dead... okay, move along
+            if(empty($pid)) {
+                return true;
+            }
+            $retries--;
+        }
+
+        // KILL IT!!
+        exec('killall -9 raspistill');
+
+        if(exec('pidof raspistill')) {
+            throw new \Exception('could not kill raspistill. I guess it\'s hung and the watchdog has to force a reboot :/');
+        }
     }
 
     /**

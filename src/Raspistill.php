@@ -309,9 +309,7 @@ class Raspistill extends Raspicam
 
         $this->valueArguments['output'] = $filename;
 
-        $this->execute(
-            $this->buildCommand()
-        );
+        $this->run();
     }
 
     /**
@@ -349,9 +347,7 @@ class Raspistill extends Raspicam
         $this->timeout($length, $timeUnit);
         $this->timelapse($interval, $timeUnit);
 
-        $this->execute(
-            $this->buildCommand()
-        );
+        $this->start();
     }
 
     /**

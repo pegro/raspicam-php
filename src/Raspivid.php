@@ -99,9 +99,7 @@ class Raspivid extends Raspicam
 
         $this->timeout($length, $timeUnit);
 
-        $this->execute(
-            $this->buildCommand()
-        );
+        $this->start();
     }
 
     /**
